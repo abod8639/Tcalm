@@ -39,7 +39,33 @@ A lightweight, zero-dependency command-line utility for Linux and macOS that mon
 
 ### 2. Install
 
-#### One-Line Install (Recommended)
+#### Arch Linux (AUR)
+
+`tcalm` is available in the **Arch User Repository (AUR)**:
+
+Using `yay`:
+```bash
+yay -S tcalm
+```
+
+Using `paru`:
+```bash
+paru -S tcalm
+```
+
+Or manually with `makepkg`:
+```bash
+git clone https://aur.archlinux.org/tcalm.git
+cd tcalm
+makepkg -si
+```
+
+Enable and start the background service immediately:
+```bash
+systemctl --user enable --now tcalm
+```
+
+#### One-Line Install (Other Linux & macOS)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/abod8639/Tcalm/main/install.sh | bash

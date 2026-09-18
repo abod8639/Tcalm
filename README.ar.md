@@ -39,7 +39,33 @@
 
 ### 2. خطوات التثبيت
 
-#### التثبيت السريع بسطر واحد (موصى به)
+#### لمستخدمي Arch Linux (AUR)
+
+الأداة متوفرة رسمياً في مستودعات **AUR**:
+
+باستخدام `yay`:
+```bash
+yay -S tcalm
+```
+
+باستخدام `paru`:
+```bash
+paru -S tcalm
+```
+
+أو التثبيت اليدوي عبر `makepkg`:
+```bash
+git clone https://aur.archlinux.org/tcalm.git
+cd tcalm
+makepkg -si
+```
+
+تفعيل وتشغيل الخدمة في الخلفية فوراً:
+```bash
+systemctl --user enable --now tcalm
+```
+
+#### التثبيت السريع بسطر واحد (لباقي توزيعات Linux و macOS)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/abod8639/Tcalm/main/install.sh | bash
