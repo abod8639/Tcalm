@@ -357,7 +357,7 @@ def read_key():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 
-def select_menu(title, options, initial_index=0, lang="en", start_search=False, allow_shortcut_search=False):
+def select_menu(title, options, initial_index=0, lang="en", start_search=False):
     """
     Renders an interactive selection list navigable with UP/DOWN arrows.
     Supports pressing '/' to activate instant live search / filtering.
@@ -389,7 +389,11 @@ def select_menu(title, options, initial_index=0, lang="en", start_search=False, 
                         matched = (
                             q in val.get("country_ar", "").lower()
                             or q in val.get("country_en", "").lower()
+                            or q in val.get("ar", "").lower()
+                            or q in val.get("en", "").lower()
                         )
+                    if not matched and isinstance(val, str):
+                        matched = q in val.lower()
                     if matched:
                         filtered_options.append(opt)
             else:
@@ -437,8 +441,6 @@ def select_menu(title, options, initial_index=0, lang="en", start_search=False, 
                 continue
 
             if key == '/':
-                if not search_mode and allow_shortcut_search:
-                    return 'SEARCH_COUNTRY'
                 search_mode = True
                 continue
             elif search_mode and key == 'BACKSPACE':
@@ -484,7 +486,7 @@ def select_menu(title, options, initial_index=0, lang="en", start_search=False, 
         sys.stdout.flush()
 
 
-def choose_country_and_city(cfg, start_search=False):
+def choose_country_and_city(cfg):
     """Wizard to select country and corresponding city in pure chosen language."""
     lang = cfg.get("language", "en")
     country_field = "country_ar" if lang == "ar" else "country_en"
@@ -496,8 +498,7 @@ def choose_country_and_city(cfg, start_search=False):
     chosen_country = select_menu(
         t("tui_select_country", lang=lang),
         country_options,
-        lang=lang,
-        start_search=start_search
+        lang=lang
     )
     if not chosen_country:
         return False
@@ -698,13 +699,13 @@ def run_config_tui():
             (t("tui_opt_cancel", lang=lang), "EXIT")
         ]
 
-        action = select_menu(menu_title, main_options, lang=lang, allow_shortcut_search=True)
+        action = select_menu(menu_title, main_options, lang=lang)
 
         if action == "LANGUAGE":
             choose_language(cfg)
 
-        elif action in ("COUNTRY", "SEARCH_COUNTRY"):
-            choose_country_and_city(cfg, start_search=(action == "SEARCH_COUNTRY"))
+        elif action == "COUNTRY":
+            choose_country_and_city(cfg)
 
         elif action == "AUTO":
             sys.stdout.write(CLEAR_SCREEN)
