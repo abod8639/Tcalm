@@ -42,18 +42,18 @@
 #### التثبيت السريع بسطر واحد (موصى به)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/abot8639/Tcalm/master/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/abod8639/Tcalm/main/install.sh | bash
 ```
 
 أو عبر `wget`:
 ```bash
-wget -qO- https://raw.githubusercontent.com/abot8639/Tcalm/master/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/abod8639/Tcalm/main/install.sh | bash
 ```
 
 #### التثبيت اليدوي
 
 ```bash
-git clone https://github.com/abot8639/Tcalm.git
+git clone https://github.com/abod8639/Tcalm.git
 cd Tcalm
 chmod +x install.sh
 ./install.sh
