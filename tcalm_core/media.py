@@ -94,7 +94,7 @@ def pause_media():
     return False
 
 
-def send_notification(prayer_name, lang="ar"):
+def send_notification(prayer_name, lang="en"):
     """Sends a desktop notification on Linux or macOS in configured language."""
     from tcalm_core.i18n import t, get_prayer_name
     localized_name = get_prayer_name(prayer_name, lang=lang)
