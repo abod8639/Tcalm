@@ -39,19 +39,26 @@ fi
 
 # Determine install location
 INSTALL_DIR="$HOME/.local/bin"
-mkdir -p "$INSTALL_DIR"
+SHARE_DIR="$HOME/.local/share/tcalm"
+mkdir -p "$INSTALL_DIR" "$SHARE_DIR"
 
-SCRIPT_SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/tcalm"
+SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_SRC="$SRC_DIR/tcalm"
+MODULES_SRC="$SRC_DIR/tcalm_core"
 
-if [ ! -f "$SCRIPT_SRC" ]; then
-    echo -e "${RED}[!] Error: Could not find 'tcalm' script in $(dirname "${BASH_SOURCE[0]}")${NC}"
+if [ ! -f "$SCRIPT_SRC" ] || [ ! -d "$MODULES_SRC" ]; then
+    echo -e "${RED}[!] Error: Could not find 'tcalm' or 'tcalm_core' in $SRC_DIR${NC}"
     exit 1
 fi
 
 chmod +x "$SCRIPT_SRC"
+rm -rf "$SHARE_DIR/tcalm_core"
+cp -r "$MODULES_SRC" "$SHARE_DIR/"
 cp "$SCRIPT_SRC" "$INSTALL_DIR/tcalm"
+chmod +x "$INSTALL_DIR/tcalm"
 
-echo -e "${GREEN}[✓] Copied 'tcalm' to $INSTALL_DIR/tcalm${NC}"
+echo -e "${GREEN}[✓] Installed 'tcalm_core' to $SHARE_DIR${NC}"
+echo -e "${GREEN}[✓] Installed 'tcalm' binary to $INSTALL_DIR/tcalm${NC}"
 
 # Check if ~/.local/bin is in PATH
 if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
