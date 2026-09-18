@@ -3,7 +3,7 @@ import json
 from datetime import date
 import pytest
 from tcalm_core.cli import main, cmd_status, cmd_list, cmd_test, cmd_config
-from tcalm_core.constants import VERSION
+from tcalm_core.constants import VERSION, DEFAULT_CONFIG
 
 
 def test_cli_version(monkeypatch, capsys):
@@ -22,6 +22,7 @@ def test_cli_status(monkeypatch, capsys, isolated_tcalm_env):
         "Isha": "19:30",
     }
     monkeypatch.setattr("tcalm_core.cli.get_prayer_times", lambda cfg, dt: mock_timings)
+    monkeypatch.setattr("tcalm_core.config.detect_location", lambda: DEFAULT_CONFIG.copy())
 
     monkeypatch.setattr(sys, "argv", ["tcalm", "status"])
     main()
