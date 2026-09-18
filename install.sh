@@ -42,13 +42,22 @@ INSTALL_DIR="$HOME/.local/bin"
 SHARE_DIR="$HOME/.local/share/tcalm"
 mkdir -p "$INSTALL_DIR" "$SHARE_DIR"
 
-SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo "")"
 SCRIPT_SRC="$SRC_DIR/tcalm"
 MODULES_SRC="$SRC_DIR/tcalm_core"
 
-if [ ! -f "$SCRIPT_SRC" ] || [ ! -d "$MODULES_SRC" ]; then
-    echo -e "${RED}[!] Error: Could not find 'tcalm' or 'tcalm_core' in $SRC_DIR${NC}"
-    exit 1
+TEMP_DIR=""
+if [ -z "$SRC_DIR" ] || [ ! -f "$SCRIPT_SRC" ] || [ ! -d "$MODULES_SRC" ]; then
+    echo -e "${BLUE}[*] Fetching Tcalm repository...${NC}"
+    TEMP_DIR="$(mktemp -d)"
+    trap 'rm -rf "$TEMP_DIR"' EXIT
+    git clone --depth 1 https://github.com/abot8639/Tcalm.git "$TEMP_DIR" &> /dev/null || {
+        echo -e "${RED}[!] Error: Failed to clone repository from GitHub.${NC}"
+        exit 1
+    }
+    SRC_DIR="$TEMP_DIR"
+    SCRIPT_SRC="$SRC_DIR/tcalm"
+    MODULES_SRC="$SRC_DIR/tcalm_core"
 fi
 
 chmod +x "$SCRIPT_SRC"
