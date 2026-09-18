@@ -10,13 +10,12 @@ import sys
 
 # 1. Look for tcalm_core relative to the actual real path of this file (e.g. repo or symlink target)
 real_script_dir = os.path.dirname(os.path.realpath(__file__))
+shared_dir = os.path.expanduser("~/.local/share/tcalm")
+
 if os.path.isdir(os.path.join(real_script_dir, "tcalm_core")):
     if real_script_dir not in sys.path:
         sys.path.insert(0, real_script_dir)
-
-# 2. Look for installed tcalm_core in user's ~/.local/share/tcalm
-shared_dir = os.path.expanduser("~/.local/share/tcalm")
-if os.path.isdir(os.path.join(shared_dir, "tcalm_core")):
+elif os.path.isdir(os.path.join(shared_dir, "tcalm_core")):
     if shared_dir not in sys.path:
         sys.path.insert(0, shared_dir)
 
