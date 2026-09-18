@@ -51,7 +51,7 @@ if [ -z "$SRC_DIR" ] || [ ! -f "$SCRIPT_SRC" ] || [ ! -d "$MODULES_SRC" ]; then
     echo -e "${BLUE}[*] Fetching Tcalm repository...${NC}"
     TEMP_DIR="$(mktemp -d)"
     trap 'rm -rf "$TEMP_DIR"' EXIT
-    git clone --depth 1 https://github.com/abot8639/Tcalm.git "$TEMP_DIR" &> /dev/null || {
+    git clone --depth 1 https://github.com/abod8639/Tcalm.git "$TEMP_DIR" &> /dev/null || {
         echo -e "${RED}[!] Error: Failed to clone repository from GitHub.${NC}"
         exit 1
     }
