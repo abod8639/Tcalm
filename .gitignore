@@ -2,3 +2,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 .DS_Store
+build/
+dist/
+*.egg-info/
+pkg/
+src/
+*.tar.gz
+*.tar.zst

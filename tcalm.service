@@ -4,7 +4,7 @@ After=network.target sound.target
 
 [Service]
 Type=simple
-ExecStart=%h/.local/bin/tcalm run
+ExecStart=/usr/bin/tcalm run
 Restart=always
 RestartSec=10
 

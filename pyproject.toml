@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tcalm"
+version = "1.0.0"
+description = "Prayer Time Media Pauser for Linux & macOS"
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "Abdelrahman", email = "abot8639@gmail.com"}
+]
+keywords = ["adhan", "prayer-times", "media-pauser", "arch-linux", "hyprland", "linux"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Topic :: Utilities",
+]
+requires-python = ">=3.8"
+dependencies = []
+
+[project.scripts]
+tcalm = "tcalm_core.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/abod8639/Tcalm"
+Repository = "https://github.com/abod8639/Tcalm.git"
+Issues = "https://github.com/abod8639/Tcalm/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tcalm_core*"]
