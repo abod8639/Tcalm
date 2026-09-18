@@ -94,11 +94,12 @@ def pause_media():
     return False
 
 
-def send_notification(prayer_name):
-    """Sends a desktop notification on Linux or macOS."""
-    arabic_name = PRAYER_NAMES_AR.get(prayer_name, prayer_name)
-    title = f"حان الآن موعد أذان {arabic_name}"
-    body = "تم إيقاف الوسائط مؤقتاً (Tcalm)"
+def send_notification(prayer_name, lang="ar"):
+    """Sends a desktop notification on Linux or macOS in configured language."""
+    from tcalm_core.i18n import t, get_prayer_name
+    localized_name = get_prayer_name(prayer_name, lang=lang)
+    title = t("notify_title", lang=lang, prayer=localized_name)
+    body = t("notify_body", lang=lang)
 
     os_name = get_system_os()
     if os_name == "linux":
@@ -118,14 +119,15 @@ def send_notification(prayer_name):
             pass
 
 
-def execute_adhan_pause(prayer_name, duration_minutes=0, notify=True):
+def execute_adhan_pause(prayer_name, duration_minutes=0, notify=True, lang="ar"):
     """Executes media pause and optional duration hold."""
-    arabic_name = PRAYER_NAMES_AR.get(prayer_name, prayer_name)
-    log_message(f"Triggering Adhan pause for {prayer_name} ({arabic_name}).")
+    from tcalm_core.i18n import get_prayer_name
+    localized_name = get_prayer_name(prayer_name, lang=lang)
+    log_message(f"Triggering Adhan pause for {prayer_name} ({localized_name}).")
 
     pause_media()
     if notify:
-        send_notification(prayer_name)
+        send_notification(prayer_name, lang=lang)
 
     if duration_minutes > 0:
         end_time = time.time() + (duration_minutes * 60)
