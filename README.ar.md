@@ -39,8 +39,21 @@
 
 ### 2. خطوات التثبيت
 
+#### التثبيت السريع بسطر واحد (موصى به)
+
 ```bash
-git clone https://github.com/yourusername/Tcalm.git
+curl -fsSL https://raw.githubusercontent.com/abot8639/Tcalm/master/install.sh | bash
+```
+
+أو عبر `wget`:
+```bash
+wget -qO- https://raw.githubusercontent.com/abot8639/Tcalm/master/install.sh | bash
+```
+
+#### التثبيت اليدوي
+
+```bash
+git clone https://github.com/abot8639/Tcalm.git
 cd Tcalm
 chmod +x install.sh
 ./install.sh
