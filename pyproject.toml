@@ -24,6 +24,12 @@ dependencies = []
 [project.scripts]
 tcalm = "tcalm_core.cli:main"
 
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0"
+]
+
 [project.urls]
 Homepage = "https://github.com/abod8639/Tcalm"
 Repository = "https://github.com/abod8639/Tcalm.git"
@@ -32,3 +38,12 @@ Issues = "https://github.com/abod8639/Tcalm/issues"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["tcalm_core*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v"
+
+[tool.coverage.run]
+source = ["tcalm_core"]
+omit = ["tests/*"]
