@@ -107,6 +107,12 @@ def print_status_summary(cfg):
     timings = get_prayer_times(cfg, now.date())
 
     upcoming = []
+def print_status_summary(cfg):
+    lang = cfg.get("language", "ar")
+    now = datetime.now()
+    timings = get_prayer_times(cfg, now.date())
+
+    upcoming = []
     for p in cfg.get("prayers", ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]):
         t_str = timings.get(p)
         if t_str:
@@ -120,36 +126,45 @@ def print_status_summary(cfg):
         diff = next_dt - now
         hours, remainder = divmod(int(diff.total_seconds()), 3600)
         minutes, _ = divmod(remainder, 60)
-        ar_name = PRAYER_NAMES_AR.get(next_name, next_name)
-        time_left_str = f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
-        print(f"    Next Prayer: {next_name} ({ar_name}) at {timings[next_name]} (in {time_left_str})")
+        p_name = get_prayer_name(next_name, lang=lang)
+        if hours > 0:
+            time_left_str = t("time_hours_minutes", lang=lang, hours=hours, minutes=minutes)
+        else:
+            time_left_str = t("time_minutes", lang=lang, minutes=minutes)
+        msg = t("next_prayer", lang=lang, name=p_name, time=timings[next_name], left=time_left_str)
+        print(f"    {msg}")
     else:
-        print("    Next Prayer: Fajr tomorrow morning.")
+        print(f"    {t('next_fajr_tomorrow', lang=lang)}")
 
 
 def cmd_status():
     pid = get_daemon_pid()
     cfg = load_config()
+    lang = cfg.get("language", "ar")
 
     print("==================================================")
-    print("                 Tcalm Status                     ")
+    print(f"                 {t('status_title', lang=lang)}                     ")
     print("==================================================")
 
+    status_label = "Status" if lang == "en" else "الحالة"
     if pid:
-        print(f"  ● Status:           RUNNING (PID: {pid})")
+        status_txt = f"{t('status_running', lang=lang)} (PID: {pid})"
+        print(f"  ● {status_label:<14}: {status_txt}")
     else:
-        print("  ○ Status:           STOPPED")
+        status_txt = t("status_stopped", lang=lang)
+        print(f"  ○ {status_label:<14}: {status_txt}")
 
     utc_offset = datetime.now().astimezone().strftime("%z")
     formatted_offset = f"UTC{utc_offset[:3]}:{utc_offset[3:]}"
-    dst_status = "Active (صيفي)" if time.localtime().tm_isdst > 0 else "Inactive (شتوي)"
+    dst_status = t("dst_active", lang=lang) if time.localtime().tm_isdst > 0 else t("dst_inactive", lang=lang)
 
-    print(f"  ● Location:         {cfg.get('city')}, {cfg.get('country')}")
-    print(f"  ● Timezone:         {cfg.get('timezone')} ({formatted_offset}, DST: {dst_status})")
-    print(f"  ● Coordinates:      Lat: {cfg.get('latitude')}, Lng: {cfg.get('longitude')}")
-    print(f"  ● Method:           {CALCULATION_METHODS.get(cfg.get('method', 5), 'Custom')}")
+    print(f"  ● {t('location', lang=lang):<14}: {cfg.get('city')}, {cfg.get('country')}")
+    print(f"  ● {t('timezone', lang=lang):<14}: {cfg.get('timezone')} ({formatted_offset}, {dst_status})")
+    print(f"  ● {t('coordinates', lang=lang):<14}: Lat: {cfg.get('latitude')}, Lng: {cfg.get('longitude')}")
+    print(f"  ● {t('method', lang=lang):<14}: {get_method_name(cfg.get('method', 5), lang=lang)}")
     dur = cfg.get("pause_duration_minutes", 0)
-    print(f"  ● Pause Action:     {'Single Pause (مرة واحدة)' if dur == 0 else f'Hold for {dur} minutes'}")
+    dur_text = t("single_pause", lang=lang) if dur == 0 else t("hold_minutes", lang=lang, minutes=dur)
+    print(f"  ● {t('pause_action', lang=lang):<14}: {dur_text}")
     print("--------------------------------------------------")
 
     print_status_summary(cfg)
@@ -158,41 +173,48 @@ def cmd_status():
 
 def cmd_list():
     cfg = load_config()
+    lang = cfg.get("language", "ar")
     now = datetime.now()
     timings = get_prayer_times(cfg, now.date())
 
-    print(f"\nPrayer Times for {cfg.get('city')}, {cfg.get('country')} ({now.strftime('%Y-%m-%d')}):")
+    print(f"\n{t('list_title', lang=lang, city=cfg.get('city'), country=cfg.get('country'), date=now.strftime('%Y-%m-%d'))}")
     print("--------------------------------------------------")
-    print(" Prayer      | الصلاة       | Time      | Status   ")
+    print(f" {t('col_prayer', lang=lang):<12} | {t('col_time', lang=lang):<9} | {t('col_status', lang=lang)}")
     print("--------------------------------------------------")
 
     allowed = cfg.get("prayers", ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"])
     for p in allowed:
         t_str = timings.get(p, "--:--")
-        ar_name = PRAYER_NAMES_AR.get(p, p)
+        p_name = get_prayer_name(p, lang=lang)
 
         status = ""
         if t_str != "--:--":
             hh, mm = map(int, t_str.split(":"))
             p_dt = datetime(now.year, now.month, now.day, hh, mm, 0)
             if p_dt < now:
-                status = "Passed"
+                status = t("status_passed", lang=lang)
             else:
                 diff = p_dt - now
                 hours, rem = divmod(int(diff.total_seconds()), 3600)
                 minutes, _ = divmod(rem, 60)
-                status = f"in {hours}h {minutes}m" if hours > 0 else f"in {minutes}m"
+                if hours > 0:
+                    time_str = t("time_hours_minutes", lang=lang, hours=hours, minutes=minutes)
+                else:
+                    time_str = t("time_minutes", lang=lang, minutes=minutes)
+                status = t("status_in", lang=lang, time=time_str)
 
-        print(f" {p:<11} | {ar_name:<12} | {t_str:<9} | {status}")
+        print(f" {p_name:<12} | {t_str:<9} | {status}")
     print("--------------------------------------------------\n")
 
 
 def cmd_test():
-    print("[*] Testing media pause and desktop notification...")
+    cfg = load_config()
+    lang = cfg.get("language", "ar")
+    print(t("test_start", lang=lang))
     paused = pause_media()
-    send_notification("Dhuhr")
-    print(f"[✓] Media pause triggered (Success: {paused}).")
-    print("[✓] Notification sent. You should see a desktop banner.")
+    send_notification("Dhuhr", lang=lang)
+    print(t("test_paused", lang=lang, success=paused))
+    print(t("test_notified", lang=lang))
 
 
 def cmd_config(args):
@@ -206,6 +228,7 @@ def cmd_config(args):
         args.method is not None,
         args.duration is not None,
         args.notifications is not None,
+        getattr(args, "language", None) is not None,
         getattr(args, "json", False),
     ])
 
@@ -220,13 +243,20 @@ def cmd_config(args):
         return
 
     cfg = load_config()
+    lang = cfg.get("language", "ar")
     modified = False
 
-    if args.auto_detect:
-        print("[*] Detecting location and timezone automatically...")
-        cfg = detect_location()
+    if getattr(args, "language", None):
+        cfg["language"] = args.language
+        lang = args.language
         modified = True
-        print(f"[✓] Detected: {cfg.get('city')}, {cfg.get('country')} ({cfg.get('timezone')})")
+
+    if args.auto_detect:
+        print(t("auto_detecting", lang=lang))
+        detected = detect_location()
+        cfg.update(detected)
+        modified = True
+        print(t("auto_detected", lang=lang, city=cfg.get("city"), country=cfg.get("country"), timezone=cfg.get("timezone")))
 
     if args.city:
         cfg["city"] = args.city
@@ -242,11 +272,11 @@ def cmd_config(args):
         cfg["longitude"] = args.lng
         modified = True
     if args.method is not None:
-        if args.method in CALCULATION_METHODS:
+        if args.method in CALCULATION_METHODS[lang]:
             cfg["method"] = args.method
             modified = True
         else:
-            print("[!] Invalid method. Choose from 1 to 15.")
+            print(t("invalid_method", lang=lang))
     if args.duration is not None:
         cfg["pause_duration_minutes"] = max(0, args.duration)
         modified = True
@@ -261,10 +291,10 @@ def cmd_config(args):
                 os.remove(CACHE_FILE)
             except Exception:
                 pass
-        print("[✓] Configuration updated successfully.")
+        print(t("config_saved", lang=lang))
 
         if get_daemon_pid():
-            print("[*] Restarting running daemon to apply changes...")
+            print(t("config_restarting", lang=lang))
             cmd_restart()
 
 
