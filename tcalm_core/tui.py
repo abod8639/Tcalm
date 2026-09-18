@@ -3,6 +3,7 @@ import sys
 import json
 import tty
 import termios
+import select
 
 from tcalm_core.constants import CACHE_FILE
 from tcalm_core.config import load_config, save_config
