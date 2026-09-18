@@ -336,6 +336,7 @@ Examples:
     cfg_parser.add_argument("--duration", type=int, help="Pause duration in minutes (0 for single pause)")
     cfg_parser.add_argument("--notifications", type=str, help="Enable or disable desktop notifications (true/false)")
     cfg_parser.add_argument("--auto-detect", action="store_true", help="Auto-detect location and timezone")
+    cfg_parser.add_argument("--language", choices=["ar", "en"], help="Set interface language (ar/en)")
     cfg_parser.add_argument("--json", action="store_true", help="Print configuration in JSON format without interactive TUI")
 
     subparsers.add_parser("version", help="Show version")
