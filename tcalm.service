@@ -1,0 +1,12 @@
+[Unit]
+Description=Tcalm - Prayer Time Media Pauser (Linux & macOS)
+After=network.target sound.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/tcalm run
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
