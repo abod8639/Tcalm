@@ -28,68 +28,27 @@
 
 ## التثبيت
 
-### 1. المتطلبات
-
-- بايثون 3.8 أو أحدث.
-- **Linux**: يوصى بتثبيت أداة `playerctl` للتحكم الأمثل في الوسائط:
-  - Arch Linux: `sudo pacman -S playerctl`
-  - Debian / Ubuntu: `sudo apt install playerctl`
-  - Fedora: `sudo dnf install playerctl`
-- **macOS**: إصدار macOS 10.15 أو أحدث (لا يتطلب أدوات إضافية).
-
-### 2. خطوات التثبيت
-
-#### لمستخدمي Arch Linux (AUR)
-
-الأداة متوفرة رسمياً في مستودعات **AUR**:
-
-باستخدام `yay`:
+### مستخدمو Arch Linux (AUR)
 ```bash
 yay -S tcalm
 ```
 
-باستخدام `paru`:
-```bash
-paru -S tcalm
-```
-
-أو التثبيت اليدوي عبر `makepkg`:
-```bash
-git clone https://aur.archlinux.org/tcalm.git
-cd tcalm
-makepkg -si
-```
-
-تفعيل وتشغيل الخدمة في الخلفية فوراً:
-```bash
-systemctl --user enable --now tcalm
-```
-
-#### التثبيت السريع بسطر واحد (لباقي توزيعات Linux و macOS)
-
+### باقي توزيعات Linux و macOS
 ```bash
 curl -fsSL https://raw.githubusercontent.com/abod8639/Tcalm/main/install.sh | bash
 ```
 
-أو عبر `wget`:
-```bash
-wget -qO- https://raw.githubusercontent.com/abod8639/Tcalm/main/install.sh | bash
-```
-
-#### التثبيت اليدوي
+<details>
+<summary>التثبيت اليدوي</summary>
 
 ```bash
 git clone https://github.com/abod8639/Tcalm.git
 cd Tcalm
-chmod +x install.sh
 ./install.sh
 ```
+</details>
 
-يقوم سكربت التثبيت بالآتي:
-1. التحقق من بيئة العمل والمتطلبات.
-2. تثبيت الحزمة البرمجية `tcalm_core` في `~/.local/share/tcalm`.
-3. تثبيت الملف التنفيذي `tcalm` في `~/.local/bin/tcalm`.
-4. (Linux) إعداد خدمة systemd للمستخدم تلقائياً (`tcalm.service`).
+> **المتطلبات**: بايثون 3.8+ (وأداة `playerctl` على لينكس للتحكم في الوسائط).
 
 تأكد من وجود المسار `~/.local/bin` ضمن متغير البيئة `PATH`:
 ```bash

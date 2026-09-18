@@ -28,68 +28,27 @@ A lightweight, zero-dependency command-line utility for Linux and macOS that mon
 
 ## Installation
 
-### 1. Requirements
-
-- Python 3.8+
-- Linux: `playerctl` (recommended for optimal media management)
-  - Arch Linux: `sudo pacman -S playerctl`
-  - Debian / Ubuntu: `sudo apt install playerctl`
-  - Fedora: `sudo dnf install playerctl`
-- macOS: macOS 10.15+ (no extra packages needed)
-
-### 2. Install
-
-#### Arch Linux (AUR)
-
-`tcalm` is available in the **Arch User Repository (AUR)**:
-
-Using `yay`:
+### Arch Linux (AUR)
 ```bash
 yay -S tcalm
 ```
 
-Using `paru`:
-```bash
-paru -S tcalm
-```
-
-Or manually with `makepkg`:
-```bash
-git clone https://aur.archlinux.org/tcalm.git
-cd tcalm
-makepkg -si
-```
-
-Enable and start the background service immediately:
-```bash
-systemctl --user enable --now tcalm
-```
-
-#### One-Line Install (Other Linux & macOS)
-
+### Linux & macOS
 ```bash
 curl -fsSL https://raw.githubusercontent.com/abod8639/Tcalm/main/install.sh | bash
 ```
 
-Or using `wget`:
-```bash
-wget -qO- https://raw.githubusercontent.com/abod8639/Tcalm/main/install.sh | bash
-```
-
-#### Manual Installation
+<details>
+<summary>Manual Installation</summary>
 
 ```bash
 git clone https://github.com/abod8639/Tcalm.git
 cd Tcalm
-chmod +x install.sh
 ./install.sh
 ```
+</details>
 
-The installer performs the following:
-1. Validates Python environment and dependencies.
-2. Installs the `tcalm_core` package to `~/.local/share/tcalm`.
-3. Installs the executable binary to `~/.local/bin/tcalm`.
-4. (Linux) Configures a systemd user service unit (`tcalm.service`).
+> **Requirements**: Python 3.8+ (and `playerctl` on Linux for media control).
 
 Ensure `~/.local/bin` is included in your system `PATH`:
 ```bash
