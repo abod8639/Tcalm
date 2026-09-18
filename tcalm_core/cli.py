@@ -13,8 +13,6 @@ from tcalm_core.constants import (
     PID_FILE,
     LOG_FILE,
     CACHE_FILE,
-    PRAYER_NAMES_AR,
-    CALCULATION_METHODS,
 )
 from tcalm_core.config import (
     ensure_config_dir,
@@ -25,12 +23,21 @@ from tcalm_core.geo import detect_location
 from tcalm_core.prayer import get_prayer_times
 from tcalm_core.media import pause_media, send_notification
 from tcalm_core.daemon import is_pid_running, get_daemon_pid, daemon_loop
+from tcalm_core.i18n import (
+    t,
+    get_prayer_name,
+    get_method_name,
+    CALCULATION_METHODS,
+)
 
 
 def cmd_start():
     pid = get_daemon_pid()
+    cfg = load_config()
+    lang = cfg.get("language", "ar")
+
     if pid:
-        print(f"[*] Tcalm is already running (PID: {pid}).")
+        print(t("daemon_already_running", lang=lang, pid=pid))
         return
 
     ensure_config_dir()
@@ -57,8 +64,7 @@ def cmd_start():
 
     time.sleep(0.5)
     if is_pid_running(proc.pid):
-        print(f"[✓] Tcalm daemon started successfully (PID: {proc.pid}).")
-        cfg = load_config()
+        print(t("daemon_started", lang=lang, pid=proc.pid))
         print_status_summary(cfg)
     else:
         print(f"[!] Failed to start Tcalm daemon. Check {LOG_FILE} for details.")
@@ -66,8 +72,11 @@ def cmd_start():
 
 def cmd_stop():
     pid = get_daemon_pid()
+    cfg = load_config()
+    lang = cfg.get("language", "ar")
+
     if not pid:
-        print("[-] Tcalm is not running.")
+        print(t("daemon_not_running", lang=lang))
         if os.path.exists(PID_FILE):
             try:
                 os.remove(PID_FILE)
@@ -75,7 +84,7 @@ def cmd_stop():
                 pass
         return
 
-    print(f"[*] Stopping Tcalm daemon (PID: {pid})...")
+    print(t("daemon_stopping", lang=lang, pid=pid))
     try:
         os.kill(pid, signal.SIGTERM)
         for _ in range(30):
@@ -93,21 +102,13 @@ def cmd_stop():
         except Exception:
             pass
 
-    print("[✓] Tcalm daemon stopped.")
+    print(t("daemon_stopped", lang=lang))
 
 
 def cmd_restart():
     cmd_stop()
     time.sleep(0.5)
     cmd_start()
-
-
-def print_status_summary(cfg):
-    now = datetime.now()
-    timings = get_prayer_times(cfg, now.date())
-
-    upcoming = []
-def print_status_summary(cfg):
     lang = cfg.get("language", "ar")
     now = datetime.now()
     timings = get_prayer_times(cfg, now.date())
