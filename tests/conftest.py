@@ -49,6 +49,11 @@ def isolated_tcalm_env(tmp_path, monkeypatch):
     monkeypatch.setattr(cli_mod, "LOG_FILE", test_log_file)
     monkeypatch.setattr(cli_mod, "CACHE_FILE", test_cache_file)
 
+    # Initialize default config file
+    import json
+    with open(test_config_file, "w", encoding="utf-8") as f:
+        json.dump(consts.DEFAULT_CONFIG, f, indent=2, ensure_ascii=False)
+
     return {
         "config_dir": test_dir_str,
         "config_file": test_config_file,
