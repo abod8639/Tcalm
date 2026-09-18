@@ -16,9 +16,16 @@ if command -v tcalm &> /dev/null; then
 fi
 
 INSTALL_BIN="$HOME/.local/bin/tcalm"
+SHARE_DIR="$HOME/.local/share/tcalm"
+
 if [ -f "$INSTALL_BIN" ]; then
     rm -f "$INSTALL_BIN"
     echo -e "${GREEN}[✓] Removed $INSTALL_BIN${NC}"
+fi
+
+if [ -d "$SHARE_DIR" ]; then
+    rm -rf "$SHARE_DIR"
+    echo -e "${GREEN}[✓] Removed $SHARE_DIR${NC}"
 fi
 
 # Stop and remove systemd service if exists
