@@ -109,7 +109,10 @@ def cmd_restart():
     cmd_stop()
     time.sleep(0.5)
     cmd_start()
-    lang = cfg.get("language", "ar")
+
+
+def print_status_summary(cfg):
+    lang = cfg.get("language", "en")
     now = datetime.now()
     timings = get_prayer_times(cfg, now.date())
 
