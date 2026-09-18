@@ -66,6 +66,11 @@ cp -r "$MODULES_SRC" "$SHARE_DIR/"
 cp "$SCRIPT_SRC" "$INSTALL_DIR/tcalm"
 chmod +x "$INSTALL_DIR/tcalm"
 
+if [ -f "$SRC_DIR/uninstall.sh" ]; then
+    cp "$SRC_DIR/uninstall.sh" "$SHARE_DIR/uninstall.sh"
+    chmod +x "$SHARE_DIR/uninstall.sh"
+fi
+
 echo -e "${GREEN}[✓] Installed 'tcalm_core' to $SHARE_DIR${NC}"
 echo -e "${GREEN}[✓] Installed 'tcalm' binary to $INSTALL_DIR/tcalm${NC}"
 

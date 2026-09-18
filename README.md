@@ -186,15 +186,20 @@ Tcalm/
 
 ## Uninstallation
 
-To remove Tcalm from your system:
-
+### Arch Linux (AUR)
 ```bash
-chmod +x uninstall.sh
-./uninstall.sh
-
-# To purge configuration, cache, and log files (~/.config/tcalm):
-./uninstall.sh --purge
+yay -R tcalm
 ```
+
+### Linux & macOS
+```bash
+curl -fsSL https://raw.githubusercontent.com/abod8639/Tcalm/main/uninstall.sh | bash
+```
+
+> **Clean Data**: To completely remove configuration, logs, and cache (`~/.config/tcalm`):
+> ```bash
+> rm -rf ~/.config/tcalm
+> ```
 
 ---
 

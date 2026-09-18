@@ -186,15 +186,20 @@ Tcalm/
 
 ## إزالة التثبيت
 
-لإزالة الأداة من النظام:
-
+### مستخدمو Arch Linux (AUR)
 ```bash
-chmod +x uninstall.sh
-./uninstall.sh
-
-# لحذف ملفات الإعدادات والذاكرة المؤقتة والسجلات (~/.config/tcalm):
-./uninstall.sh --purge
+yay -R tcalm
 ```
+
+### باقي توزيعات Linux و macOS
+```bash
+curl -fsSL https://raw.githubusercontent.com/abod8639/Tcalm/main/uninstall.sh | bash
+```
+
+> **حذف البيانات**: لحذف ملفات الإعدادات والذاكرة المؤقتة والسجلات تماماً (`~/.config/tcalm`):
+> ```bash
+> rm -rf ~/.config/tcalm
+> ```
 
 ---
 
