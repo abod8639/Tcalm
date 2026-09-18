@@ -39,8 +39,21 @@ A lightweight, zero-dependency command-line utility for Linux and macOS that mon
 
 ### 2. Install
 
+#### One-Line Install (Recommended)
+
 ```bash
-git clone https://github.com/yourusername/Tcalm.git
+curl -fsSL https://raw.githubusercontent.com/abot8639/Tcalm/master/install.sh | bash
+```
+
+Or using `wget`:
+```bash
+wget -qO- https://raw.githubusercontent.com/abot8639/Tcalm/master/install.sh | bash
+```
+
+#### Manual Installation
+
+```bash
+git clone https://github.com/abot8639/Tcalm.git
 cd Tcalm
 chmod +x install.sh
 ./install.sh
