@@ -77,7 +77,8 @@ def daemon_loop():
 
                 if 0 <= diff_secs < 60 and key not in last_handled:
                     last_handled[key] = True
-                    execute_adhan_pause(p_name, duration, notify)
+                    lang = cfg.get("language", "en")
+                    execute_adhan_pause(p_name, duration, notify, lang=lang)
                 elif p_dt > now:
                     upcoming_prayers.append((p_dt, p_name))
 
