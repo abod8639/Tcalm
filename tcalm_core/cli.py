@@ -34,7 +34,7 @@ from tcalm_core.i18n import (
 def cmd_start():
     pid = get_daemon_pid()
     cfg = load_config()
-    lang = cfg.get("language", "ar")
+    lang = cfg.get("language", "en")
 
     if pid:
         print(t("daemon_already_running", lang=lang, pid=pid))
@@ -73,7 +73,7 @@ def cmd_start():
 def cmd_stop():
     pid = get_daemon_pid()
     cfg = load_config()
-    lang = cfg.get("language", "ar")
+    lang = cfg.get("language", "en")
 
     if not pid:
         print(t("daemon_not_running", lang=lang))
@@ -144,7 +144,7 @@ def print_status_summary(cfg):
 def cmd_status():
     pid = get_daemon_pid()
     cfg = load_config()
-    lang = cfg.get("language", "ar")
+    lang = cfg.get("language", "en")
 
     print("==================================================")
     print(f"                 {t('status_title', lang=lang)}                     ")
@@ -177,7 +177,7 @@ def cmd_status():
 
 def cmd_list():
     cfg = load_config()
-    lang = cfg.get("language", "ar")
+    lang = cfg.get("language", "en")
     now = datetime.now()
     timings = get_prayer_times(cfg, now.date())
 
@@ -213,7 +213,7 @@ def cmd_list():
 
 def cmd_test():
     cfg = load_config()
-    lang = cfg.get("language", "ar")
+    lang = cfg.get("language", "en")
     print(t("test_start", lang=lang))
     paused = pause_media()
     send_notification("Dhuhr", lang=lang)
@@ -247,7 +247,7 @@ def cmd_config(args):
         return
 
     cfg = load_config()
-    lang = cfg.get("language", "ar")
+    lang = cfg.get("language", "en")
     modified = False
 
     if getattr(args, "language", None):

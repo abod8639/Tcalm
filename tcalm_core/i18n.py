@@ -200,22 +200,22 @@ MESSAGES = {
 }
 
 
-def t(key, lang="ar", **kwargs):
+def t(key, lang="en", **kwargs):
     """Retrieve translated string by key and format with kwargs."""
-    lang_msgs = MESSAGES.get(lang, MESSAGES["ar"])
-    template = lang_msgs.get(key, MESSAGES["en"].get(key, key))
+    lang_msgs = MESSAGES.get(lang, MESSAGES["en"])
+    template = lang_msgs.get(key, MESSAGES["ar"].get(key, key))
     if kwargs:
         return template.format(**kwargs)
     return template
 
 
-def get_prayer_name(prayer_key, lang="ar"):
+def get_prayer_name(prayer_key, lang="en"):
     """Returns localized prayer name."""
-    names = PRAYER_NAMES.get(lang, PRAYER_NAMES["ar"])
+    names = PRAYER_NAMES.get(lang, PRAYER_NAMES["en"])
     return names.get(prayer_key, prayer_key)
 
 
-def get_method_name(method_id, lang="ar"):
+def get_method_name(method_id, lang="en"):
     """Returns localized calculation method name."""
-    methods = CALCULATION_METHODS.get(lang, CALCULATION_METHODS["ar"])
+    methods = CALCULATION_METHODS.get(lang, CALCULATION_METHODS["en"])
     return methods.get(method_id, f"Custom ({method_id})")

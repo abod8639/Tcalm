@@ -357,7 +357,7 @@ def read_key():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 
-def select_menu(title, options, initial_index=0, lang="ar", start_search=False, allow_shortcut_search=False):
+def select_menu(title, options, initial_index=0, lang="en", start_search=False, allow_shortcut_search=False):
     """
     Renders an interactive selection list navigable with UP/DOWN arrows.
     Supports pressing '/' to activate instant live search / filtering.
@@ -486,7 +486,7 @@ def select_menu(title, options, initial_index=0, lang="ar", start_search=False, 
 
 def choose_country_and_city(cfg, start_search=False):
     """Wizard to select country and corresponding city in pure chosen language."""
-    lang = cfg.get("language", "ar")
+    lang = cfg.get("language", "en")
     country_field = "country_ar" if lang == "ar" else "country_en"
     city_field = "ar" if lang == "ar" else "en"
 
@@ -553,7 +553,7 @@ def choose_country_and_city(cfg, start_search=False):
 
 def choose_timezone(cfg):
     """Sub-menu to choose timezone in chosen language."""
-    lang = cfg.get("language", "ar")
+    lang = cfg.get("language", "en")
     system_tz = "Africa/Cairo"
     try:
         import time as pytime
@@ -597,7 +597,7 @@ def choose_timezone(cfg):
 
 def choose_method(cfg):
     """Sub-menu to choose prayer calculation method in chosen language."""
-    lang = cfg.get("language", "ar")
+    lang = cfg.get("language", "en")
     methods_dict = CALCULATION_METHODS.get(lang, CALCULATION_METHODS["ar"])
     method_options = []
     for k, v in methods_dict.items():
@@ -617,7 +617,7 @@ def choose_method(cfg):
 
 def choose_duration(cfg):
     """Sub-menu to choose pause duration in chosen language."""
-    lang = cfg.get("language", "ar")
+    lang = cfg.get("language", "en")
     dur_options = [
         (t("single_pause", lang=lang), 0),
         (t("hold_minutes", lang=lang, minutes=5), 5),
@@ -648,7 +648,7 @@ def choose_duration(cfg):
 
 def choose_language(cfg):
     """Sub-menu to choose application language (Arabic or English)."""
-    lang = cfg.get("language", "ar")
+    lang = cfg.get("language", "en")
     lang_options = [
         ("العربية (Arabic)", "ar"),
         ("English (الإنجليزية)", "en")
@@ -670,12 +670,12 @@ def run_config_tui():
     cfg = load_config()
 
     while True:
-        lang = cfg.get("language", "ar")
+        lang = cfg.get("language", "en")
         method_name = get_method_name(cfg.get("method", 5), lang=lang)
         dur = cfg.get("pause_duration_minutes", 0)
         dur_str = t("single_pause", lang=lang) if dur == 0 else t("hold_minutes", lang=lang, minutes=dur)
         notify_str = t("tui_enabled", lang=lang) if cfg.get("notifications", True) else t("tui_disabled", lang=lang)
-        current_lang_name = LANGUAGES.get(lang, "العربية")
+        current_lang_name = LANGUAGES.get(lang, "English")
 
         menu_title = (
             f"{t('tui_dashboard', lang=lang)}\n"

@@ -119,7 +119,7 @@ def send_notification(prayer_name, lang="en"):
             pass
 
 
-def execute_adhan_pause(prayer_name, duration_minutes=0, notify=True, lang="ar"):
+def execute_adhan_pause(prayer_name, duration_minutes=0, notify=True, lang="en"):
     """Executes media pause and optional duration hold."""
     from tcalm_core.i18n import get_prayer_name
     localized_name = get_prayer_name(prayer_name, lang=lang)
