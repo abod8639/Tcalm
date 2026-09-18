@@ -196,6 +196,29 @@ def cmd_test():
 
 
 def cmd_config(args):
+    has_flags = any([
+        args.auto_detect,
+        args.city is not None,
+        args.country is not None,
+        args.timezone is not None,
+        args.lat is not None,
+        args.lng is not None,
+        args.method is not None,
+        args.duration is not None,
+        args.notifications is not None,
+        getattr(args, "json", False),
+    ])
+
+    if not has_flags:
+        from tcalm_core.tui import run_config_tui
+        run_config_tui()
+        return
+
+    if getattr(args, "json", False):
+        cfg = load_config()
+        print(json.dumps(cfg, indent=2, ensure_ascii=False))
+        return
+
     cfg = load_config()
     modified = False
 
@@ -243,8 +266,6 @@ def cmd_config(args):
         if get_daemon_pid():
             print("[*] Restarting running daemon to apply changes...")
             cmd_restart()
-    else:
-        print(json.dumps(cfg, indent=2, ensure_ascii=False))
 
 
 def main():
@@ -284,6 +305,7 @@ Examples:
     cfg_parser.add_argument("--duration", type=int, help="Pause duration in minutes (0 for single pause)")
     cfg_parser.add_argument("--notifications", type=str, help="Enable or disable desktop notifications (true/false)")
     cfg_parser.add_argument("--auto-detect", action="store_true", help="Auto-detect location and timezone")
+    cfg_parser.add_argument("--json", action="store_true", help="Print configuration in JSON format without interactive TUI")
 
     subparsers.add_parser("version", help="Show version")
 
