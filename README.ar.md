@@ -196,10 +196,6 @@ yay -R tcalm
 curl -fsSL https://raw.githubusercontent.com/abod8639/Tcalm/main/uninstall.sh | bash
 ```
 
-> **حذف البيانات**: لحذف ملفات الإعدادات والذاكرة المؤقتة والسجلات تماماً (`~/.config/tcalm`):
-> ```bash
-> rm -rf ~/.config/tcalm
-> ```
 
 ---
 
