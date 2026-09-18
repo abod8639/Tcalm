@@ -297,20 +297,30 @@ def read_key():
         tty.setraw(fd)
         ch = sys.stdin.read(1)
         if ch == '\x1b':
-            ch2 = sys.stdin.read(1)
-            if ch2 == '[':
-                ch3 = sys.stdin.read(1)
-                if ch3 == 'A':
-                    return 'UP'
-                elif ch3 == 'B':
-                    return 'DOWN'
-                elif ch3 == 'C':
-                    return 'RIGHT'
-                elif ch3 == 'D':
-                    return 'LEFT'
+            import select
+            r, _, _ = select.select([sys.stdin], [], [], 0.05)
+            if r:
+                ch2 = sys.stdin.read(1)
+                if ch2 == '[':
+                    ch3 = sys.stdin.read(1)
+                    if ch3 == 'A':
+                        return 'UP'
+                    elif ch3 == 'B':
+                        return 'DOWN'
+                    elif ch3 == 'C':
+                        return 'RIGHT'
+                    elif ch3 == 'D':
+                        return 'LEFT'
+                    elif ch3 == '3':
+                        sys.stdin.read(1)  # ~
+                        return 'BACKSPACE'
+                elif ch2 == '\x1b':
+                    return 'ESC'
             return 'ESC'
         elif ch in ('\r', '\n'):
             return 'ENTER'
+        elif ch in ('\x7f', '\x08'):
+            return 'BACKSPACE'
         elif ch == '\x03':  # Ctrl+C
             raise KeyboardInterrupt
         return ch
@@ -318,18 +328,19 @@ def read_key():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 
-def select_menu(title, options, initial_index=0, lang="ar"):
+def select_menu(title, options, initial_index=0, lang="ar", start_search=False, allow_shortcut_search=False):
     """
     Renders an interactive selection list navigable with UP/DOWN arrows.
-    options is a list of strings or (display_label, value) tuples.
-    Returns the selected value (or index), or None if canceled.
+    Supports pressing '/' to activate instant live search / filtering.
     """
     selected = initial_index
     page_size = 12
     offset = 0
+    search_query = ""
+    search_mode = start_search
 
-    num_items = len(options)
-    if num_items == 0:
+    num_total = len(options)
+    if num_total == 0:
         return None
 
     sys.stdout.write(HIDE_CURSOR)
@@ -337,6 +348,28 @@ def select_menu(title, options, initial_index=0, lang="ar"):
 
     try:
         while True:
+            # Filter options based on search query
+            if search_query.strip():
+                q = search_query.strip().lower()
+                filtered_options = []
+                for opt in options:
+                    label = opt[0] if isinstance(opt, tuple) else str(opt)
+                    val = opt[1] if isinstance(opt, tuple) else opt
+                    matched = q in label.lower()
+                    if not matched and isinstance(val, dict):
+                        matched = (
+                            q in val.get("country_ar", "").lower()
+                            or q in val.get("country_en", "").lower()
+                        )
+                    if matched:
+                        filtered_options.append(opt)
+            else:
+                filtered_options = list(options)
+
+            num_items = len(filtered_options)
+            if num_items > 0 and selected >= num_items:
+                selected = num_items - 1
+
             if selected < offset:
                 offset = selected
             elif selected >= offset + page_size:
@@ -348,38 +381,72 @@ def select_menu(title, options, initial_index=0, lang="ar"):
             lines.append(f"{BOLD}{BLUE}=================================================={RESET}")
             lines.append(f"{DIM}{t('tui_nav_help', lang=lang)}{RESET}\n")
 
-            visible_items = options[offset:offset + page_size]
-            for i, opt in enumerate(visible_items):
-                actual_idx = offset + i
-                label = opt[0] if isinstance(opt, tuple) else str(opt)
-                if actual_idx == selected:
-                    lines.append(f"  {BOLD}{CYAN}❯ {label}{RESET}")
-                else:
-                    lines.append(f"    {label}")
+            if search_mode or search_query:
+                lines.append(f"  {YELLOW}{t('tui_search_prompt', lang=lang)}:{RESET} {BOLD}{search_query}{RESET}█\n")
 
-            if num_items > page_size:
-                lines.append(f"\n{DIM}  ({selected + 1}/{num_items}){RESET}")
+            if num_items == 0:
+                lines.append(f"  {DIM}{t('tui_no_results', lang=lang)}{RESET}\n")
+            else:
+                visible_items = filtered_options[offset:offset + page_size]
+                for i, opt in enumerate(visible_items):
+                    actual_idx = offset + i
+                    label = opt[0] if isinstance(opt, tuple) else str(opt)
+                    if actual_idx == selected:
+                        lines.append(f"  {BOLD}{CYAN}❯ {label}{RESET}")
+                    else:
+                        lines.append(f"    {label}")
+
+                if num_items > page_size:
+                    lines.append(f"\n{DIM}  ({selected + 1}/{num_items}){RESET}")
 
             lines.append(f"\n{BOLD}{BLUE}--------------------------------------------------{RESET}")
             sys.stdout.write("\n".join(lines) + "\n")
             sys.stdout.flush()
 
             key = read_key()
-            if key == 'UP':
-                selected = (selected - 1) % num_items
+            if key == '/':
+                if not search_mode and allow_shortcut_search:
+                    return 'SEARCH_COUNTRY'
+                search_mode = True
+                continue
+            elif search_mode and key == 'BACKSPACE':
+                if search_query:
+                    search_query = search_query[:-1]
+                selected = 0
+                offset = 0
+                continue
+            elif search_mode and len(key) == 1 and key.isprintable():
+                search_query += key
+                selected = 0
+                offset = 0
+                continue
+            elif key == 'UP':
+                if num_items > 0:
+                    selected = (selected - 1) % num_items
             elif key == 'DOWN':
-                selected = (selected + 1) % num_items
+                if num_items > 0:
+                    selected = (selected + 1) % num_items
             elif key == 'ENTER':
-                chosen = options[selected]
-                return chosen[1] if isinstance(chosen, tuple) else chosen
+                if num_items > 0:
+                    chosen = filtered_options[selected]
+                    return chosen[1] if isinstance(chosen, tuple) else chosen
             elif key in ('ESC', 'q', 'Q'):
-                return None
+                if search_query:
+                    search_query = ""
+                    selected = 0
+                    offset = 0
+                    continue
+                elif search_mode:
+                    search_mode = False
+                    continue
+                else:
+                    return None
     finally:
         sys.stdout.write(SHOW_CURSOR)
         sys.stdout.flush()
 
 
-def choose_country_and_city(cfg):
+def choose_country_and_city(cfg, start_search=False):
     """Wizard to select country and corresponding city in pure chosen language."""
     lang = cfg.get("language", "ar")
     country_field = "country_ar" if lang == "ar" else "country_en"
@@ -388,7 +455,12 @@ def choose_country_and_city(cfg):
     country_options = [(c[country_field], c) for c in COUNTRIES_DATA]
     country_options.append((t("tui_custom_entry", lang=lang), "CUSTOM"))
 
-    chosen_country = select_menu(t("tui_select_country", lang=lang), country_options, lang=lang)
+    chosen_country = select_menu(
+        t("tui_select_country", lang=lang),
+        country_options,
+        lang=lang,
+        start_search=start_search
+    )
     if not chosen_country:
         return False
 
@@ -588,13 +660,13 @@ def run_config_tui():
             (t("tui_opt_cancel", lang=lang), "EXIT")
         ]
 
-        action = select_menu(menu_title, main_options, lang=lang)
+        action = select_menu(menu_title, main_options, lang=lang, allow_shortcut_search=True)
 
         if action == "LANGUAGE":
             choose_language(cfg)
 
-        elif action == "COUNTRY":
-            choose_country_and_city(cfg)
+        elif action in ("COUNTRY", "SEARCH_COUNTRY"):
+            choose_country_and_city(cfg, start_search=(action == "SEARCH_COUNTRY"))
 
         elif action == "AUTO":
             sys.stdout.write(CLEAR_SCREEN)
