@@ -34,6 +34,7 @@ CALCULATION_METHODS = {
 }
 
 DEFAULT_CONFIG = {
+    "language": "en",
     "auto_detect": True,
     "city": "Cairo",
     "country": "Egypt",
