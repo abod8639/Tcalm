@@ -7,7 +7,7 @@ name = "tcalm"
 version = "1.0.0"
 description = "Prayer Time Media Pauser for Linux & macOS"
 readme = "README.md"
-license = "MIT"
+license = { text = "MIT" }
 authors = [
     {name = "Abdelrahman", email = "abot8639@gmail.com"}
 ]
