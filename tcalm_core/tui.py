@@ -3,18 +3,17 @@ import sys
 import json
 import tty
 import termios
-from datetime import datetime
 
-from tcalm_core.constants import (
-    CALCULATION_METHODS,
-    CACHE_FILE,
-)
-from tcalm_core.config import (
-    load_config,
-    save_config,
-)
+from tcalm_core.constants import CACHE_FILE
+from tcalm_core.config import load_config, save_config
 from tcalm_core.geo import detect_location
 from tcalm_core.daemon import get_daemon_pid
+from tcalm_core.i18n import (
+    LANGUAGES,
+    CALCULATION_METHODS,
+    t,
+    get_method_name,
+)
 
 # Colors and styling
 RESET = "\033[0m"
@@ -31,227 +30,227 @@ SHOW_CURSOR = "\033[?25h"
 
 COUNTRIES_DATA = [
     {
-        "name": "Egypt (مصر)",
-        "country": "Egypt",
+        "country_ar": "مصر",
+        "country_en": "Egypt",
         "method": 5,
         "timezone": "Africa/Cairo",
         "lat": 30.0444, "lng": 31.2357,
         "cities": [
-            ("Cairo (القاهرة)", 30.0444, 31.2357),
-            ("Alexandria (الإسكندرية)", 31.2001, 29.9187),
-            ("Giza (الجيزة)", 30.0131, 31.2089),
-            ("Mansoura (المنصورة)", 31.0409, 31.3785),
-            ("Tanta (طنطا)", 30.7865, 31.0004),
-            ("Assiut (أسيوط)", 27.1783, 31.1859),
-            ("Sohag (سوهاج)", 26.5569, 31.6948),
-            ("Luxor (الأقصر)", 25.6872, 32.6396),
-            ("Aswan (أسوان)", 24.0889, 32.8998),
-            ("Port Said (بورسعيد)", 31.2653, 32.3019),
-            ("Suez (السويس)", 29.9668, 32.5498),
-            ("Hurghada (الغردقة)", 27.2579, 33.8116),
-            ("Sharm El-Sheikh (شرم الشيخ)", 27.9158, 34.3299),
+            {"ar": "القاهرة", "en": "Cairo", "lat": 30.0444, "lng": 31.2357},
+            {"ar": "الإسكندرية", "en": "Alexandria", "lat": 31.2001, "lng": 29.9187},
+            {"ar": "الجيزة", "en": "Giza", "lat": 30.0131, "lng": 31.2089},
+            {"ar": "المنصورة", "en": "Mansoura", "lat": 31.0409, "lng": 31.3785},
+            {"ar": "طنطا", "en": "Tanta", "lat": 30.7865, "lng": 31.0004},
+            {"ar": "أسيوط", "en": "Assiut", "lat": 27.1783, "lng": 31.1859},
+            {"ar": "سوهاج", "en": "Sohag", "lat": 26.5569, "lng": 31.6948},
+            {"ar": "الأقصر", "en": "Luxor", "lat": 25.6872, "lng": 32.6396},
+            {"ar": "أسوان", "en": "Aswan", "lat": 24.0889, "lng": 32.8998},
+            {"ar": "بورسعيد", "en": "Port Said", "lat": 31.2653, "lng": 32.3019},
+            {"ar": "السويس", "en": "Suez", "lat": 29.9668, "lng": 32.5498},
+            {"ar": "الغردقة", "en": "Hurghada", "lat": 27.2579, "lng": 33.8116},
+            {"ar": "شرم الشيخ", "en": "Sharm El-Sheikh", "lat": 27.9158, "lng": 34.3299},
         ]
     },
     {
-        "name": "Saudi Arabia (المملكة العربية السعودية)",
-        "country": "Saudi Arabia",
+        "country_ar": "المملكة العربية السعودية",
+        "country_en": "Saudi Arabia",
         "method": 4,
         "timezone": "Asia/Riyadh",
         "lat": 24.7136, "lng": 46.6753,
         "cities": [
-            ("Makkah (مكة المكرمة)", 21.3891, 39.8579),
-            ("Madinah (المدينة المنورة)", 24.5247, 39.5692),
-            ("Riyadh (الرياض)", 24.7136, 46.6753),
-            ("Jeddah (جدة)", 21.5433, 39.1728),
-            ("Dammam (الدمام)", 26.4207, 50.0888),
-            ("Khobar (الخبر)", 26.2172, 50.1971),
-            ("Taif (الطائف)", 21.2854, 40.4222),
-            ("Tabuk (تبوك)", 28.3835, 36.5662),
-            ("Abha (أبها)", 18.2164, 42.5053),
-            ("Buraidah (بريدة)", 26.3260, 43.9750),
+            {"ar": "مكة المكرمة", "en": "Makkah", "lat": 21.3891, "lng": 39.8579},
+            {"ar": "المدينة المنورة", "en": "Madinah", "lat": 24.5247, "lng": 39.5692},
+            {"ar": "الرياض", "en": "Riyadh", "lat": 24.7136, "lng": 46.6753},
+            {"ar": "جدة", "en": "Jeddah", "lat": 21.5433, "lng": 39.1728},
+            {"ar": "الدمام", "en": "Dammam", "lat": 26.4207, "lng": 50.0888},
+            {"ar": "الخبر", "en": "Khobar", "lat": 26.2172, "lng": 50.1971},
+            {"ar": "الطائف", "en": "Taif", "lat": 21.2854, "lng": 40.4222},
+            {"ar": "تبوك", "en": "Tabuk", "lat": 28.3835, "lng": 36.5662},
+            {"ar": "أبها", "en": "Abha", "lat": 18.2164, "lng": 42.5053},
+            {"ar": "بريدة", "en": "Buraidah", "lat": 26.3260, "lng": 43.9750},
         ]
     },
     {
-        "name": "United Arab Emirates (الإمارات العربية المتحدة)",
-        "country": "United Arab Emirates",
+        "country_ar": "الإمارات العربية المتحدة",
+        "country_en": "United Arab Emirates",
         "method": 8,
         "timezone": "Asia/Dubai",
         "lat": 25.2048, "lng": 55.2708,
         "cities": [
-            ("Abu Dhabi (أبوظبي)", 24.4539, 54.3773),
-            ("Dubai (دبي)", 25.2048, 55.2708),
-            ("Sharjah (الشارقة)", 25.3463, 55.4209),
-            ("Ajman (عجمان)", 25.4052, 55.5136),
-            ("Ras Al Khaimah (رأس الخيمة)", 25.7895, 55.9432),
-            ("Al Ain (العين)", 24.2075, 55.7447),
+            {"ar": "أبوظبي", "en": "Abu Dhabi", "lat": 24.4539, "lng": 54.3773},
+            {"ar": "دبي", "en": "Dubai", "lat": 25.2048, "lng": 55.2708},
+            {"ar": "الشارقة", "en": "Sharjah", "lat": 25.3463, "lng": 55.4209},
+            {"ar": "عجمان", "en": "Ajman", "lat": 25.4052, "lng": 55.5136},
+            {"ar": "رأس الخيمة", "en": "Ras Al Khaimah", "lat": 25.7895, "lng": 55.9432},
+            {"ar": "العين", "en": "Al Ain", "lat": 24.2075, "lng": 55.7447},
         ]
     },
     {
-        "name": "Kuwait (الكويت)",
-        "country": "Kuwait",
+        "country_ar": "الكويت",
+        "country_en": "Kuwait",
         "method": 9,
         "timezone": "Asia/Kuwait",
         "lat": 29.3759, "lng": 47.9774,
         "cities": [
-            ("Kuwait City (مدينة الكويت)", 29.3759, 47.9774),
-            ("Hawalli (حولي)", 29.3328, 48.0282),
-            ("Salmiya (السالمية)", 29.3344, 48.0772),
-            ("Ahmadi (الأحمدي)", 29.0769, 48.0839),
+            {"ar": "مدينة الكويت", "en": "Kuwait City", "lat": 29.3759, "lng": 47.9774},
+            {"ar": "حولي", "en": "Hawalli", "lat": 29.3328, "lng": 48.0282},
+            {"ar": "السالمية", "en": "Salmiya", "lat": 29.3344, "lng": 48.0772},
+            {"ar": "الأحمدي", "en": "Ahmadi", "lat": 29.0769, "lng": 48.0839},
         ]
     },
     {
-        "name": "Qatar (قطر)",
-        "country": "Qatar",
+        "country_ar": "قطر",
+        "country_en": "Qatar",
         "method": 10,
         "timezone": "Asia/Qatar",
         "lat": 25.2854, "lng": 51.5310,
         "cities": [
-            ("Doha (الدوحة)", 25.2854, 51.5310),
-            ("Al Rayyan (الريان)", 25.2919, 51.4244),
-            ("Al Wakrah (الوكرة)", 25.1768, 51.6048),
+            {"ar": "الدوحة", "en": "Doha", "lat": 25.2854, "lng": 51.5310},
+            {"ar": "الريان", "en": "Al Rayyan", "lat": 25.2919, "lng": 51.4244},
+            {"ar": "الوكرة", "en": "Al Wakrah", "lat": 25.1768, "lng": 51.6048},
         ]
     },
     {
-        "name": "Bahrain (البحرين)",
-        "country": "Bahrain",
+        "country_ar": "البحرين",
+        "country_en": "Bahrain",
         "method": 8,
         "timezone": "Asia/Bahrain",
         "lat": 26.2285, "lng": 50.5860,
         "cities": [
-            ("Manama (المنامة)", 26.2285, 50.5860),
-            ("Riffa (الرفاع)", 26.1300, 50.5550),
-            ("Muharraq (المحرق)", 26.2572, 50.6119),
+            {"ar": "المنامة", "en": "Manama", "lat": 26.2285, "lng": 50.5860},
+            {"ar": "الرفاع", "en": "Riffa", "lat": 26.1300, "lng": 50.5550},
+            {"ar": "المحرق", "en": "Muharraq", "lat": 26.2572, "lng": 50.6119},
         ]
     },
     {
-        "name": "Oman (سلطنة عمان)",
-        "country": "Oman",
+        "country_ar": "سلطنة عمان",
+        "country_en": "Oman",
         "method": 8,
         "timezone": "Asia/Muscat",
         "lat": 23.5880, "lng": 58.3829,
         "cities": [
-            ("Muscat (مسقط)", 23.5880, 58.3829),
-            ("Salalah (صلالة)", 17.0151, 54.0924),
-            ("Sohar (صحار)", 24.3461, 56.7075),
-            ("Nizwa (نزوى)", 22.9333, 57.5333),
+            {"ar": "مسقط", "en": "Muscat", "lat": 23.5880, "lng": 58.3829},
+            {"ar": "صلالة", "en": "Salalah", "lat": 17.0151, "lng": 54.0924},
+            {"ar": "صحار", "en": "Sohar", "lat": 24.3461, "lng": 56.7075},
+            {"ar": "نزوى", "en": "Nizwa", "lat": 22.9333, "lng": 57.5333},
         ]
     },
     {
-        "name": "Jordan (الأردن)",
-        "country": "Jordan",
+        "country_ar": "الأردن",
+        "country_en": "Jordan",
         "method": 3,
         "timezone": "Asia/Amman",
         "lat": 31.9454, "lng": 35.9284,
         "cities": [
-            ("Amman (عمّان)", 31.9454, 35.9284),
-            ("Zarqa (الزرقاء)", 32.0728, 36.0880),
-            ("Irbid (إربد)", 32.5568, 35.8469),
-            ("Aqaba (العقبة)", 29.5321, 35.0063),
+            {"ar": "عمّان", "en": "Amman", "lat": 31.9454, "lng": 35.9284},
+            {"ar": "الزرقاء", "en": "Zarqa", "lat": 32.0728, "lng": 36.0880},
+            {"ar": "إربد", "en": "Irbid", "lat": 32.5568, "lng": 35.8469},
+            {"ar": "العقبة", "en": "Aqaba", "lat": 29.5321, "lng": 35.0063},
         ]
     },
     {
-        "name": "Palestine (فلسطين)",
-        "country": "Palestine",
+        "country_ar": "فلسطين",
+        "country_en": "Palestine",
         "method": 3,
         "timezone": "Asia/Gaza",
         "lat": 31.9522, "lng": 35.2332,
         "cities": [
-            ("Jerusalem / Al-Quds (القدس الشريف)", 31.7683, 35.2137),
-            ("Gaza (غزة)", 31.5017, 34.4668),
-            ("Ramallah (رام الله)", 31.9038, 35.2034),
-            ("Nablus (نابلس)", 32.2211, 35.2544),
-            ("Hebron (الخليل)", 31.5326, 35.0998),
+            {"ar": "القدس الشريف", "en": "Jerusalem", "lat": 31.7683, "lng": 35.2137},
+            {"ar": "غزة", "en": "Gaza", "lat": 31.5017, "lng": 34.4668},
+            {"ar": "رام الله", "en": "Ramallah", "lat": 31.9038, "lng": 35.2034},
+            {"ar": "نابلس", "en": "Nablus", "lat": 32.2211, "lng": 35.2544},
+            {"ar": "الخليل", "en": "Hebron", "lat": 31.5326, "lng": 35.0998},
         ]
     },
     {
-        "name": "Iraq (العراق)",
-        "country": "Iraq",
+        "country_ar": "العراق",
+        "country_en": "Iraq",
         "method": 3,
         "timezone": "Asia/Baghdad",
         "lat": 33.3152, "lng": 44.3661,
         "cities": [
-            ("Baghdad (بغداد)", 33.3152, 44.3661),
-            ("Basra (البصرة)", 30.5081, 47.7835),
-            ("Erbil (أربيل)", 36.1911, 44.0092),
-            ("Mosul (الموصل)", 36.3400, 43.1300),
-            ("Najaf (النجف)", 32.0259, 44.3462),
+            {"ar": "بغداد", "en": "Baghdad", "lat": 33.3152, "lng": 44.3661},
+            {"ar": "البصرة", "en": "Basra", "lat": 30.5081, "lng": 47.7835},
+            {"ar": "أربيل", "en": "Erbil", "lat": 36.1911, "lng": 44.0092},
+            {"ar": "الموصل", "en": "Mosul", "lat": 36.3400, "lng": 43.1300},
+            {"ar": "النجف الأشرف", "en": "Najaf", "lat": 32.0259, "lng": 44.3462},
         ]
     },
     {
-        "name": "Morocco (المغرب)",
-        "country": "Morocco",
+        "country_ar": "المغرب",
+        "country_en": "Morocco",
         "method": 3,
         "timezone": "Africa/Casablanca",
         "lat": 33.5731, "lng": -7.5898,
         "cities": [
-            ("Casablanca (الدار البيضاء)", 33.5731, -7.5898),
-            ("Rabat (الرباط)", 34.0209, -6.8416),
-            ("Marrakech (مراكش)", 31.6295, -7.9811),
-            ("Fes (فاس)", 34.0331, -5.0003),
-            ("Tangier (طنجة)", 35.7595, -5.8340),
+            {"ar": "الدار البيضاء", "en": "Casablanca", "lat": 33.5731, "lng": -7.5898},
+            {"ar": "الرباط", "en": "Rabat", "lat": 34.0209, "lng": -6.8416},
+            {"ar": "مراكش", "en": "Marrakech", "lat": 31.6295, "lng": -7.9811},
+            {"ar": "فاس", "en": "Fes", "lat": 34.0331, "lng": -5.0003},
+            {"ar": "طنجة", "en": "Tangier", "lat": 35.7595, "lng": -5.8340},
         ]
     },
     {
-        "name": "Algeria (الجزائر)",
-        "country": "Algeria",
+        "country_ar": "الجزائر",
+        "country_en": "Algeria",
         "method": 3,
         "timezone": "Africa/Algiers",
         "lat": 36.7538, "lng": 3.0588,
         "cities": [
-            ("Algiers (الجزائر العاصمة)", 36.7538, 3.0588),
-            ("Oran (وهران)", 35.6987, -0.6349),
-            ("Constantine (قسنطينة)", 36.3650, 6.6147),
+            {"ar": "الجزائر العاصمة", "en": "Algiers", "lat": 36.7538, "lng": 3.0588},
+            {"ar": "وهران", "en": "Oran", "lat": 35.6987, "lng": -0.6349},
+            {"ar": "قسنطينة", "en": "Constantine", "lat": 36.3650, "lng": 6.6147},
         ]
     },
     {
-        "name": "Tunisia (تونس)",
-        "country": "Tunisia",
+        "country_ar": "تونس",
+        "country_en": "Tunisia",
         "method": 3,
         "timezone": "Africa/Tunis",
         "lat": 36.8065, "lng": 10.1815,
         "cities": [
-            ("Tunis (تونس العاصمة)", 36.8065, 10.1815),
-            ("Sfax (صفاقس)", 34.7406, 10.7603),
-            ("Sousse (سوسة)", 35.8256, 10.6369),
+            {"ar": "تونس العاصمة", "en": "Tunis", "lat": 36.8065, "lng": 10.1815},
+            {"ar": "صفاقس", "en": "Sfax", "lat": 34.7406, "lng": 10.7603},
+            {"ar": "سوسة", "en": "Sousse", "lat": 35.8256, "lng": 10.6369},
         ]
     },
     {
-        "name": "Turkey (تركيا)",
-        "country": "Turkey",
+        "country_ar": "تركيا",
+        "country_en": "Turkey",
         "method": 13,
         "timezone": "Europe/Istanbul",
         "lat": 41.0082, "lng": 28.9784,
         "cities": [
-            ("Istanbul (إسطنبول)", 41.0082, 28.9784),
-            ("Ankara (أنقرة)", 39.9334, 32.8597),
-            ("Izmir (إزمير)", 38.4237, 27.1428),
-            ("Bursa (بورصة)", 40.1828, 29.0667),
-            ("Antalya (أنطاليا)", 36.8969, 30.7133),
+            {"ar": "إسطنبول", "en": "Istanbul", "lat": 41.0082, "lng": 28.9784},
+            {"ar": "أنقرة", "en": "Ankara", "lat": 39.9334, "lng": 32.8597},
+            {"ar": "إزمير", "en": "Izmir", "lat": 38.4237, "lng": 27.1428},
+            {"ar": "بورصة", "en": "Bursa", "lat": 40.1828, "lng": 29.0667},
+            {"ar": "أنطاليا", "en": "Antalya", "lat": 36.8969, "lng": 30.7133},
         ]
     },
     {
-        "name": "United Kingdom",
-        "country": "United Kingdom",
+        "country_ar": "المملكة المتحدة",
+        "country_en": "United Kingdom",
         "method": 3,
         "timezone": "Europe/London",
         "lat": 51.5074, "lng": -0.1278,
         "cities": [
-            ("London", 51.5074, -0.1278),
-            ("Birmingham", 52.4862, -1.8904),
-            ("Manchester", 53.4808, -2.2426),
+            {"ar": "لندن", "en": "London", "lat": 51.5074, "lng": -0.1278},
+            {"ar": "برمنغهام", "en": "Birmingham", "lat": 52.4862, "lng": -1.8904},
+            {"ar": "مانشستر", "en": "Manchester", "lat": 53.4808, "lng": -2.2426},
         ]
     },
     {
-        "name": "United States",
-        "country": "United States",
+        "country_ar": "الولايات المتحدة الأمريكية",
+        "country_en": "United States",
         "method": 2,
         "timezone": "America/New_York",
         "lat": 40.7128, "lng": -74.0060,
         "cities": [
-            ("New York", 40.7128, -74.0060),
-            ("Chicago", 41.8781, -87.6298),
-            ("Los Angeles", 34.0522, -118.2437),
-            ("Houston", 29.7604, -95.3698),
+            {"ar": "نيويورك", "en": "New York", "lat": 40.7128, "lng": -74.0060},
+            {"ar": "شيكاغو", "en": "Chicago", "lat": 41.8781, "lng": -87.6298},
+            {"ar": "لوس أنجلوس", "en": "Los Angeles", "lat": 34.0522, "lng": -118.2437},
+            {"ar": "هيوستن", "en": "Houston", "lat": 29.7604, "lng": -95.3698},
         ]
     },
 ]
@@ -319,7 +318,7 @@ def read_key():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 
-def select_menu(title, options, initial_index=0):
+def select_menu(title, options, initial_index=0, lang="ar"):
     """
     Renders an interactive selection list navigable with UP/DOWN arrows.
     options is a list of strings or (display_label, value) tuples.
@@ -338,18 +337,16 @@ def select_menu(title, options, initial_index=0):
 
     try:
         while True:
-            # Adjust offset for pagination scrolling
             if selected < offset:
                 offset = selected
             elif selected >= offset + page_size:
                 offset = selected - page_size + 1
 
-            # Render
             lines = [CLEAR_SCREEN]
             lines.append(f"{BOLD}{BLUE}=================================================={RESET}")
             lines.append(f"  {BOLD}{title}{RESET}")
             lines.append(f"{BOLD}{BLUE}=================================================={RESET}")
-            lines.append(f"{DIM}Use [↑/↓] arrows to navigate, [Enter] to select, [Esc] to return{RESET}\n")
+            lines.append(f"{DIM}{t('tui_nav_help', lang=lang)}{RESET}\n")
 
             visible_items = options[offset:offset + page_size]
             for i, opt in enumerate(visible_items):
@@ -383,22 +380,26 @@ def select_menu(title, options, initial_index=0):
 
 
 def choose_country_and_city(cfg):
-    """Wizard to select country and corresponding city."""
-    country_options = [(c["name"], c) for c in COUNTRIES_DATA]
-    country_options.append(("Custom / Manual Entry...", "CUSTOM"))
+    """Wizard to select country and corresponding city in pure chosen language."""
+    lang = cfg.get("language", "ar")
+    country_field = "country_ar" if lang == "ar" else "country_en"
+    city_field = "ar" if lang == "ar" else "en"
 
-    chosen_country = select_menu("Select Country", country_options)
+    country_options = [(c[country_field], c) for c in COUNTRIES_DATA]
+    country_options.append((t("tui_custom_entry", lang=lang), "CUSTOM"))
+
+    chosen_country = select_menu(t("tui_select_country", lang=lang), country_options, lang=lang)
     if not chosen_country:
         return False
 
     if chosen_country == "CUSTOM":
         sys.stdout.write(CLEAR_SCREEN)
-        sys.stdout.write(f"{BOLD}Enter Country Name:{RESET} ")
+        sys.stdout.write(f"{BOLD}{t('tui_enter_country', lang=lang)}{RESET} ")
         sys.stdout.flush()
         c_name = input().strip()
         if not c_name:
             return False
-        sys.stdout.write(f"{BOLD}Enter City Name:{RESET} ")
+        sys.stdout.write(f"{BOLD}{t('tui_enter_city', lang=lang)}{RESET} ")
         sys.stdout.flush()
         city_name = input().strip()
         if not city_name:
@@ -409,7 +410,7 @@ def choose_country_and_city(cfg):
         cfg["auto_detect"] = False
         return True
 
-    cfg["country"] = chosen_country["country"]
+    cfg["country"] = chosen_country[country_field]
     cfg["method"] = chosen_country["method"]
     cfg["timezone"] = chosen_country["timezone"]
     cfg["latitude"] = chosen_country["lat"]
@@ -417,36 +418,36 @@ def choose_country_and_city(cfg):
     cfg["auto_detect"] = False
 
     # Choose city
-    city_options = [(c[0], c) for c in chosen_country["cities"]]
-    city_options.append(("Enter City Manually...", "MANUAL"))
+    city_options = [(c[city_field], c) for c in chosen_country["cities"]]
+    city_options.append((t("tui_custom_entry", lang=lang), "MANUAL"))
 
-    chosen_city = select_menu(f"Select City in {chosen_country['country']}", city_options)
+    title = t("tui_select_city", lang=lang, country=chosen_country[country_field])
+    chosen_city = select_menu(title, city_options, lang=lang)
     if not chosen_city:
-        return True  # Country was saved with default city
+        return True
 
     if chosen_city == "MANUAL":
         sys.stdout.write(CLEAR_SCREEN)
-        sys.stdout.write(f"{BOLD}Enter City Name:{RESET} ")
+        sys.stdout.write(f"{BOLD}{t('tui_enter_city', lang=lang)}{RESET} ")
         sys.stdout.flush()
         c_name = input().strip()
         if c_name:
             cfg["city"] = c_name
     else:
-        cfg["city"] = chosen_city[0].split(" (")[0]
-        cfg["latitude"] = chosen_city[1]
-        cfg["longitude"] = chosen_city[2]
+        cfg["city"] = chosen_city[city_field]
+        cfg["latitude"] = chosen_city["lat"]
+        cfg["longitude"] = chosen_city["lng"]
 
     return True
 
 
 def choose_timezone(cfg):
-    """Sub-menu to choose timezone."""
-    # Get current system timezone
+    """Sub-menu to choose timezone in chosen language."""
+    lang = cfg.get("language", "ar")
     system_tz = "Africa/Cairo"
     try:
         import time as pytime
         system_tz = pytime.tzname[0]
-        # Or read /etc/timezone or /etc/localtime symlink
         if os.path.exists("/etc/timezone"):
             with open("/etc/timezone") as f:
                 system_tz = f.read().strip()
@@ -459,20 +460,20 @@ def choose_timezone(cfg):
         pass
 
     tz_options = [
-        (f"Use Current System Timezone ({system_tz})", system_tz)
+        (t("tui_system_tz", lang=lang, tz=system_tz), system_tz)
     ]
-    for tz in COMMON_TIMEZONES:
-        if tz != system_tz:
-            tz_options.append((tz, tz))
-    tz_options.append(("Enter Timezone Manually...", "MANUAL"))
+    for tz_val in COMMON_TIMEZONES:
+        if tz_val != system_tz:
+            tz_options.append((tz_val, tz_val))
+    tz_options.append((t("tui_custom_entry", lang=lang), "MANUAL"))
 
-    chosen = select_menu("Select Timezone", tz_options)
+    chosen = select_menu(t("tui_select_timezone", lang=lang), tz_options, lang=lang)
     if not chosen:
         return False
 
     if chosen == "MANUAL":
         sys.stdout.write(CLEAR_SCREEN)
-        sys.stdout.write(f"{BOLD}Enter Timezone (e.g. Africa/Cairo):{RESET} ")
+        sys.stdout.write(f"{BOLD}{t('tui_enter_timezone', lang=lang)}{RESET} ")
         sys.stdout.flush()
         tz_in = input().strip()
         if tz_in:
@@ -485,12 +486,19 @@ def choose_timezone(cfg):
 
 
 def choose_method(cfg):
-    """Sub-menu to choose prayer calculation method."""
+    """Sub-menu to choose prayer calculation method in chosen language."""
+    lang = cfg.get("language", "ar")
+    methods_dict = CALCULATION_METHODS.get(lang, CALCULATION_METHODS["ar"])
     method_options = []
-    for k, v in CALCULATION_METHODS.items():
+    for k, v in methods_dict.items():
         method_options.append((f"{k}: {v}", k))
 
-    chosen = select_menu("Select Calculation Method", method_options, initial_index=cfg.get("method", 5) - 1)
+    chosen = select_menu(
+        t("tui_select_method", lang=lang),
+        method_options,
+        initial_index=max(0, cfg.get("method", 5) - 1),
+        lang=lang
+    )
     if chosen is not None:
         cfg["method"] = chosen
         return True
@@ -498,23 +506,24 @@ def choose_method(cfg):
 
 
 def choose_duration(cfg):
-    """Sub-menu to choose pause duration."""
+    """Sub-menu to choose pause duration in chosen language."""
+    lang = cfg.get("language", "ar")
     dur_options = [
-        ("Single Pause (مرة واحدة) - Instant pause only", 0),
-        ("Hold for 5 minutes (5 دقائق)", 5),
-        ("Hold for 10 minutes (10 دقائق)", 10),
-        ("Hold for 15 minutes (15 دقيقة)", 15),
-        ("Hold for 20 minutes (20 دقيقة)", 20),
-        ("Custom Duration in minutes...", -1),
+        (t("single_pause", lang=lang), 0),
+        (t("hold_minutes", lang=lang, minutes=5), 5),
+        (t("hold_minutes", lang=lang, minutes=10), 10),
+        (t("hold_minutes", lang=lang, minutes=15), 15),
+        (t("hold_minutes", lang=lang, minutes=20), 20),
+        (t("tui_custom_entry", lang=lang), -1),
     ]
 
-    chosen = select_menu("Select Pause Duration", dur_options)
+    chosen = select_menu(t("tui_select_duration", lang=lang), dur_options, lang=lang)
     if chosen is None:
         return False
 
     if chosen == -1:
         sys.stdout.write(CLEAR_SCREEN)
-        sys.stdout.write(f"{BOLD}Enter duration in minutes (0 for single pause):{RESET} ")
+        sys.stdout.write(f"{BOLD}{t('tui_enter_duration', lang=lang)}{RESET} ")
         sys.stdout.flush()
         val = input().strip()
         try:
@@ -527,74 +536,86 @@ def choose_duration(cfg):
     return True
 
 
+def choose_language(cfg):
+    """Sub-menu to choose application language (Arabic or English)."""
+    lang = cfg.get("language", "ar")
+    lang_options = [
+        ("العربية (Arabic)", "ar"),
+        ("English (الإنجليزية)", "en")
+    ]
+    chosen = select_menu("اختر لغة الواجهة / Select Language", lang_options, lang=lang)
+    if chosen:
+        cfg["language"] = chosen
+        return True
+    return False
+
+
 def run_config_tui():
-    """Main Interactive TUI loop."""
+    """Main Interactive TUI loop in pure chosen language."""
     if not sys.stdin.isatty():
         cfg = load_config()
         print(json.dumps(cfg, indent=2, ensure_ascii=False))
         return
 
     cfg = load_config()
-    modified = False
 
     while True:
-        # Display main dashboard menu
-        method_name = CALCULATION_METHODS.get(cfg.get("method", 5), "Custom")
+        lang = cfg.get("language", "ar")
+        method_name = get_method_name(cfg.get("method", 5), lang=lang)
         dur = cfg.get("pause_duration_minutes", 0)
-        dur_str = "Single Pause (مرة واحدة)" if dur == 0 else f"{dur} minutes"
-        notify_str = "Enabled (مفعّل)" if cfg.get("notifications", True) else "Disabled (معطل)"
+        dur_str = t("single_pause", lang=lang) if dur == 0 else t("hold_minutes", lang=lang, minutes=dur)
+        notify_str = t("tui_enabled", lang=lang) if cfg.get("notifications", True) else t("tui_disabled", lang=lang)
+        current_lang_name = LANGUAGES.get(lang, "العربية")
 
         menu_title = (
-            f"Tcalm Configuration Dashboard\n"
-            f"  {DIM}Location:  {cfg.get('city')}, {cfg.get('country')}\n"
-            f"  Timezone:  {cfg.get('timezone')}\n"
-            f"  Method:    {method_name}\n"
-            f"  Pause:     {dur_str}\n"
-            f"  Notify:    {notify_str}{RESET}"
+            f"{t('tui_dashboard', lang=lang)}\n"
+            f"  {DIM}{t('location', lang=lang)}:  {cfg.get('city')}, {cfg.get('country')}\n"
+            f"  {t('timezone', lang=lang)}:  {cfg.get('timezone')}\n"
+            f"  {t('method', lang=lang)}:    {method_name}\n"
+            f"  {t('pause_action', lang=lang)}: {dur_str}\n"
+            f"  {t('tui_opt_notify', lang=lang, status=notify_str)}{RESET}"
         )
 
         main_options = [
-            ("Select Country & City (اختيار الدولة والمدينة)", "COUNTRY"),
-            ("Detect Location & Timezone Automatically (كشف تلقائي بالـ IP)", "AUTO"),
-            ("Change Timezone (تغيير المنطقة الزمنية)", "TIMEZONE"),
-            ("Change Calculation Method (تغيير طريقة الحساب)", "METHOD"),
-            ("Change Pause Duration (تغيير مدة الإيقاف)", "DURATION"),
-            (f"Toggle Desktop Notifications (إشعارات: {notify_str})", "NOTIFICATIONS"),
-            ("Save & Exit (حفظ وتطبيق)", "SAVE"),
-            ("Cancel & Exit (إلغاء)", "EXIT")
+            (f"{t('tui_opt_language', lang=lang)}: {BOLD}{current_lang_name}{RESET}", "LANGUAGE"),
+            (t("tui_opt_country", lang=lang), "COUNTRY"),
+            (t("tui_opt_auto", lang=lang), "AUTO"),
+            (t("tui_opt_timezone", lang=lang), "TIMEZONE"),
+            (t("tui_opt_method", lang=lang), "METHOD"),
+            (t("tui_opt_duration", lang=lang), "DURATION"),
+            (t("tui_opt_notify", lang=lang, status=notify_str), "NOTIFICATIONS"),
+            (t("tui_opt_save", lang=lang), "SAVE"),
+            (t("tui_opt_cancel", lang=lang), "EXIT")
         ]
 
-        action = select_menu(menu_title, main_options)
+        action = select_menu(menu_title, main_options, lang=lang)
 
-        if action == "COUNTRY":
-            if choose_country_and_city(cfg):
-                modified = True
+        if action == "LANGUAGE":
+            choose_language(cfg)
+
+        elif action == "COUNTRY":
+            choose_country_and_city(cfg)
 
         elif action == "AUTO":
             sys.stdout.write(CLEAR_SCREEN)
-            print(f"{BLUE}[*] Detecting location and timezone via IP...{RESET}")
+            print(f"{BLUE}{t('auto_detecting', lang=lang)}{RESET}")
             detected = detect_location()
             cfg.update(detected)
-            modified = True
-            print(f"{GREEN}[✓] Detected: {cfg.get('city')}, {cfg.get('country')} ({cfg.get('timezone')}){RESET}")
-            print(f"\nPress Enter to continue...")
+            print(f"{GREEN}{t('auto_detected', lang=lang, city=cfg.get('city'), country=cfg.get('country'), timezone=cfg.get('timezone'))}{RESET}")
+            print(f"\nPress Enter / اضغط Enter للمتابعة...")
             read_key()
 
         elif action == "TIMEZONE":
-            if choose_timezone(cfg):
-                modified = True
+            choose_timezone(cfg)
 
         elif action == "METHOD":
-            if choose_method(cfg):
-                modified = True
+            choose_method(cfg)
 
         elif action == "DURATION":
-            if choose_duration(cfg):
-                modified = True
+            choose_duration(cfg)
 
         elif action == "NOTIFICATIONS":
             cfg["notifications"] = not cfg.get("notifications", True)
-            modified = True
 
         elif action == "SAVE":
             save_config(cfg)
@@ -605,22 +626,19 @@ def run_config_tui():
                     pass
 
             sys.stdout.write(CLEAR_SCREEN)
-            print(f"{GREEN}[✓] Configuration saved successfully to ~/.config/tcalm/config.json{RESET}")
+            print(f"{GREEN}{t('tui_saved_msg', lang=lang)} ~/.config/tcalm/config.json{RESET}")
 
-            # Restart running daemon if active
             pid = get_daemon_pid()
             if pid:
-                print(f"{BLUE}[*] Restarting background daemon (PID: {pid}) to apply changes...{RESET}")
+                print(f"{BLUE}{t('tui_restarting_msg', lang=lang)}{RESET}")
                 try:
                     from tcalm_core.cli import cmd_restart
                     cmd_restart()
                 except Exception:
                     pass
-
-            print("\nDone.")
             break
 
         elif action in ("EXIT", None):
             sys.stdout.write(CLEAR_SCREEN)
-            print("Configuration unchanged.")
+            print(t("tui_unchanged_msg", lang=lang))
             break
