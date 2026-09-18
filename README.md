@@ -196,11 +196,6 @@ yay -R tcalm
 curl -fsSL https://raw.githubusercontent.com/abod8639/Tcalm/main/uninstall.sh | bash
 ```
 
-> **Clean Data**: To completely remove configuration, logs, and cache (`~/.config/tcalm`):
-> ```bash
-> rm -rf ~/.config/tcalm
-> ```
-
 ---
 
 ## License
