@@ -2,6 +2,13 @@
 
 [English](README.md) | [العربية](README.ar.md)
 
+<p align="center">
+  <a href="https://github.com/abod8639/Tcalm/actions/workflows/ci.yml"><img src="https://github.com/abod8639/Tcalm/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://app.codecov.io/gh/abod8639/Tcalm"><img src="https://codecov.io/gh/abod8639/Tcalm/graph/badge.svg" alt="Codecov" /></a>
+  <a href="https://aur.archlinux.org/packages/tcalm"><img src="https://img.shields.io/aur/version/tcalm" alt="AUR version" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
+</p>
+
 أداة سطر أوامر (CLI) خفيفة وعالية الكفاءة تعمل على نظامي Linux و macOS، تقوم بمراقبة مواقيت الصلاة في الخلفية وإيقاف تشغيل الوسائط (صوت وفيديو) فور دخول وقت الأذان مع إرسال إشعار على سطح المكتب.
 
 ---
@@ -180,6 +187,19 @@ Tcalm/
 ├── tcalm.service                # ملف تعريف خدمة systemd للمستخدم
 ├── README.md                    # التوثيق باللغة الإنجليزية
 └── README.ar.md                 # التوثيق باللغة العربية
+```
+
+---
+
+## التطوير واختبار الأكواد
+
+لتشغيل حزمة الاختبارات الآلية عبر `pytest`:
+```bash
+# تشغيل كافة الاختبارات
+pytest
+
+# تشغيل الاختبارات مع إظهار تقرير التغطية البرمجية
+pytest --cov=tcalm_core --cov-report=term-missing
 ```
 
 ---
