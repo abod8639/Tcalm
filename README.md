@@ -42,18 +42,18 @@ A lightweight, zero-dependency command-line utility for Linux and macOS that mon
 #### One-Line Install (Recommended)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/abot8639/Tcalm/master/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/abod8639/Tcalm/main/install.sh | bash
 ```
 
 Or using `wget`:
 ```bash
-wget -qO- https://raw.githubusercontent.com/abot8639/Tcalm/master/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/abod8639/Tcalm/main/install.sh | bash
 ```
 
 #### Manual Installation
 
 ```bash
-git clone https://github.com/abot8639/Tcalm.git
+git clone https://github.com/abod8639/Tcalm.git
 cd Tcalm
 chmod +x install.sh
 ./install.sh
@@ -138,11 +138,12 @@ tcalm test
 
 ## Configuration
 
-Settings can be inspected and updated using the `tcalm config` subcommand:
+Settings can be inspected and updated interactively via the built-in Terminal UI (TUI) or through direct CLI flags:
 
 | Command | Description |
 | :--- | :--- |
-| `tcalm config` | Print current configuration in JSON format |
+| `tcalm config` | Launch interactive Terminal UI (TUI) to configure country, city, timezone, etc. |
+| `tcalm config --json` | Print current configuration in JSON format without TUI |
 | `tcalm config --auto-detect` | Detect location and timezone automatically via IP |
 | `tcalm config --city "Alexandria"` | Set city name |
 | `tcalm config --country "Egypt"` | Set country name |
