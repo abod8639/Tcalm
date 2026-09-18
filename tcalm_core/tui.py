@@ -291,40 +291,68 @@ COMMON_TIMEZONES = [
 
 
 def read_key():
-    """Reads a single keypress or ANSI escape sequence."""
+    """Reads a single keypress or ANSI escape sequence using unbuffered os.read."""
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:
         tty.setraw(fd)
-        ch = sys.stdin.read(1)
-        if ch == '\x1b':
-            import select
-            r, _, _ = select.select([sys.stdin], [], [], 0.05)
-            if r:
-                ch2 = sys.stdin.read(1)
-                if ch2 == '[':
-                    ch3 = sys.stdin.read(1)
-                    if ch3 == 'A':
-                        return 'UP'
-                    elif ch3 == 'B':
-                        return 'DOWN'
-                    elif ch3 == 'C':
-                        return 'RIGHT'
-                    elif ch3 == 'D':
-                        return 'LEFT'
-                    elif ch3 == '3':
-                        sys.stdin.read(1)  # ~
-                        return 'BACKSPACE'
-                elif ch2 == '\x1b':
-                    return 'ESC'
+        b = os.read(fd, 1)
+        if not b:
+            return None
+
+        if b == b'\x1b':
+            # Check if more bytes of an escape sequence are waiting in the OS buffer
+            r, _, _ = select.select([fd], [], [], 0.05)
+            if not r:
+                return 'ESC'
+            seq = os.read(fd, 31)
+            full = b + seq
+
+            if full in (b'\x1b[A', b'\x1bOA') or (full.startswith((b'\x1b[', b'\x1bO')) and full.endswith(b'A')):
+                return 'UP'
+            elif full in (b'\x1b[B', b'\x1bOB') or (full.startswith((b'\x1b[', b'\x1bO')) and full.endswith(b'B')):
+                return 'DOWN'
+            elif full in (b'\x1b[C', b'\x1bOC') or (full.startswith((b'\x1b[', b'\x1bO')) and full.endswith(b'C')):
+                return 'RIGHT'
+            elif full in (b'\x1b[D', b'\x1bOD') or (full.startswith((b'\x1b[', b'\x1bO')) and full.endswith(b'D')):
+                return 'LEFT'
+            elif b'3~' in full:
+                return 'BACKSPACE'
+            elif full in (b'\x1b[H', b'\x1b[1~'):
+                return 'HOME'
+            elif full in (b'\x1b[F', b'\x1b[4~'):
+                return 'END'
+            elif b'5~' in full:
+                return 'PAGE_UP'
+            elif b'6~' in full:
+                return 'PAGE_DOWN'
             return 'ESC'
-        elif ch in ('\r', '\n'):
+
+        if b in (b'\r', b'\n'):
             return 'ENTER'
-        elif ch in ('\x7f', '\x08'):
+        elif b in (b'\x7f', b'\x08'):
             return 'BACKSPACE'
-        elif ch == '\x03':  # Ctrl+C
+        elif b == b'\x03':  # Ctrl+C
             raise KeyboardInterrupt
-        return ch
+
+        # Multi-byte UTF-8 handling for non-ASCII input (e.g. Arabic characters)
+        lead = b[0]
+        if lead < 0x80:
+            return b.decode('utf-8', errors='ignore')
+        elif (lead & 0xE0) == 0xC0:
+            needed = 1
+        elif (lead & 0xF0) == 0xE0:
+            needed = 2
+        elif (lead & 0xF8) == 0xF0:
+            needed = 3
+        else:
+            needed = 0
+
+        if needed > 0:
+            rem = os.read(fd, needed)
+            return (b + rem).decode('utf-8', errors='ignore')
+
+        return b.decode('utf-8', errors='ignore')
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
@@ -405,6 +433,9 @@ def select_menu(title, options, initial_index=0, lang="ar", start_search=False, 
             sys.stdout.flush()
 
             key = read_key()
+            if not key:
+                continue
+
             if key == '/':
                 if not search_mode and allow_shortcut_search:
                     return 'SEARCH_COUNTRY'
@@ -416,21 +447,27 @@ def select_menu(title, options, initial_index=0, lang="ar", start_search=False, 
                 selected = 0
                 offset = 0
                 continue
-            elif search_mode and len(key) == 1 and key.isprintable():
-                search_query += key
-                selected = 0
-                offset = 0
-                continue
             elif key == 'UP':
                 if num_items > 0:
                     selected = (selected - 1) % num_items
             elif key == 'DOWN':
                 if num_items > 0:
                     selected = (selected + 1) % num_items
+            elif key in ('PAGE_UP',):
+                if num_items > 0:
+                    selected = max(0, selected - page_size)
+            elif key in ('PAGE_DOWN',):
+                if num_items > 0:
+                    selected = min(num_items - 1, selected + page_size)
             elif key == 'ENTER':
                 if num_items > 0:
                     chosen = filtered_options[selected]
                     return chosen[1] if isinstance(chosen, tuple) else chosen
+            elif search_mode and len(key) == 1 and key.isprintable():
+                search_query += key
+                selected = 0
+                offset = 0
+                continue
             elif key in ('ESC', 'q', 'Q'):
                 if search_query:
                     search_query = ""
