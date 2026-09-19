@@ -152,10 +152,6 @@ tcalm test
 
 ---
 
-```bash
-systemctl --user enable --now tcalm
-```
-
 لمتابعة حالة الخدمة أو مراجعة السجلات:
 ```bash
 systemctl --user status tcalm

@@ -155,10 +155,6 @@ Updating any configuration parameter automatically restarts running daemon proce
 
 ---
 
-```bash
-systemctl --user enable --now tcalm
-```
-
 To monitor service state or view logs:
 ```bash
 systemctl --user status tcalm
