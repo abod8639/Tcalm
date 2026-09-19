@@ -13,6 +13,7 @@
 </p>
 
 <!-- [![Downloads](https://img.shields.io/github/downloads/abod8639/Tcalm/total)](https://github.com/abod8639/Tcalm/releases) -->
+<!-- [![Latest Release Downloads](https://img.shields.io/github/downloads/abod8639/Tcalm/latest/total)](https://github.com/abod8639/Tcalm/releases) -->
 
 A lightweight, zero-dependency command-line utility for Linux and macOS that monitors Islamic prayer times (Adhan) in the background, automatically pausing media playback during prayer times and delivering desktop notifications.
 
