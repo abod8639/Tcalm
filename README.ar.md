@@ -2,9 +2,12 @@
 
 [English](README.md) | [العربية](README.ar.md)
 
+![Tcalm Screenshot](assets/image.jpg)
+
+
 <p align="center">
   <a href="https://github.com/abod8639/Tcalm/actions/workflows/ci.yml"><img src="https://github.com/abod8639/Tcalm/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
-  <a href="https://app.codecov.io/gh/abod8639/Tcalm"><img src="https://codecov.io/gh/abod8639/Tcalm/graph/badge.svg" alt="Codecov" /></a>
+  <!-- <a href="https://app.codecov.io/gh/abod8639/Tcalm"><img src="https://codecov.io/gh/abod8639/Tcalm/graph/badge.svg" alt="Codecov" /></a> -->
   <a href="https://aur.archlinux.org/packages/tcalm"><img src="https://img.shields.io/aur/version/tcalm" alt="AUR version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
 </p>
