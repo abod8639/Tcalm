@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tcalm"
-version = "1.0.0"
+version = "1.1.0"
 description = "Prayer Time Media Pauser for Linux & macOS"
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
     {name = "Abdelrahman", email = "abot8639@gmail.com"}
 ]

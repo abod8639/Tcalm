@@ -1,6 +1,6 @@
 import os
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 
 CONFIG_DIR = os.path.expanduser("~/.config/tcalm")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
