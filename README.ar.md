@@ -154,7 +154,7 @@ tcalm test
 
 ## خدمة Systemd (Linux)
 
-لتشغيل الأداة تلقائياً عند بدء تسجيل الدخول للنظام (مثل Hyprland, GNOME, KDE, Sway):
+
 
 ```bash
 systemctl --user enable --now tcalm
