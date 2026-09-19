@@ -152,10 +152,6 @@ tcalm test
 
 ---
 
-## خدمة Systemd (Linux)
-
-
-
 ```bash
 systemctl --user enable --now tcalm
 ```

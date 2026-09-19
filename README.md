@@ -155,9 +155,6 @@ Updating any configuration parameter automatically restarts running daemon proce
 
 ---
 
-## Systemd Service (Linux)
-
-
 ```bash
 systemctl --user enable --now tcalm
 ```
