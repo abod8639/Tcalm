@@ -193,19 +193,6 @@ Tcalm/
 
 ---
 
-## Development & Testing
-
-Run automated tests locally with `pytest`:
-```bash
-# Run all tests
-pytest
-
-# Run tests with coverage report
-pytest --cov=tcalm_core --cov-report=term-missing
-```
-
----
-
 ## Uninstallation
 
 ### Arch Linux (AUR)
