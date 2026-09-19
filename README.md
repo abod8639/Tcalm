@@ -157,7 +157,6 @@ Updating any configuration parameter automatically restarts running daemon proce
 
 ## Systemd Service (Linux)
 
-To enable automatic background execution on user login:
 
 ```bash
 systemctl --user enable --now tcalm
