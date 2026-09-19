@@ -82,7 +82,7 @@ if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
     echo -e "      source ~/.bashrc"
 fi
 
-# Optional systemd user service setup on Linux
+# Systemd user service setup on Linux
 if [ "$OS" = "Linux" ] && command -v systemctl &> /dev/null; then
     SERVICE_DIR="$HOME/.config/systemd/user"
     mkdir -p "$SERVICE_DIR"
@@ -101,9 +101,16 @@ RestartSec=10
 [Install]
 WantedBy=default.target
 EOF
-    systemctl --user daemon-reload || true
-    echo -e "${GREEN}[✓] Created systemd user service at $SERVICE_DIR/tcalm.service${NC}"
-    echo -e "    You can enable it to start on boot: systemctl --user enable --now tcalm"
+    systemctl --user daemon-reload 2>/dev/null || true
+    if systemctl --user enable --now tcalm 2>/dev/null; then
+        systemctl --user restart tcalm 2>/dev/null || true
+        echo -e "${GREEN}[✓] Enabled and started systemd user service (tcalm)${NC}"
+        sleep 0.5
+    else
+        echo -e "${GREEN}[✓] Created systemd user service at $SERVICE_DIR/tcalm.service${NC}"
+        echo -e "${YELLOW}[!] Notice: Could not automatically start systemd service (no active user session).${NC}"
+        echo -e "    You can enable and start it manually: systemctl --user enable --now tcalm"
+    fi
 fi
 
 echo -e "\n${BLUE}Initializing configuration & checking status...${NC}"
