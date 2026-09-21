@@ -85,6 +85,8 @@ def test_cli_config_modify(monkeypatch, capsys, isolated_tcalm_env):
             "4",
             "--duration",
             "5",
+            "--before",
+            "2",
             "--language",
             "ar",
         ],
@@ -102,6 +104,7 @@ def test_cli_config_modify(monkeypatch, capsys, isolated_tcalm_env):
     assert cfg["country"] == "Saudi Arabia"
     assert cfg["method"] == 4
     assert cfg["pause_duration_minutes"] == 5
+    assert cfg["pause_before_minutes"] == 2
     assert cfg["language"] == "ar"
 
 
