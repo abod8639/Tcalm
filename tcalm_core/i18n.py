@@ -127,7 +127,18 @@ MESSAGES = {
         "tui_enter_timezone": "أدخل المنطقة الزمنية (مثال: Africa/Cairo):",
         "tui_enter_duration": "أدخل المدة بالدقائق (0 للإيقاف الفوري فقط):",
         "tui_custom_entry": "إدخال يدوي مخصص...",
-        "tui_system_tz": "استخدام توقيت النظام المحلي ({tz})"
+        "tui_system_tz": "استخدام توقيت النظام المحلي ({tz})",
+        "pause_before": "الإيقاف المسبق",
+        "pause_before_exact": "عند موعد الأذان تماماً",
+        "pause_before_1m": "قبل الأذان بدقيقة واحدة",
+        "pause_before_nm": "قبل الأذان بـ {minutes} دقائق",
+        "notify_title_before_1m": "متبقي دقيقة على أذان {prayer}",
+        "notify_body_before_1m": "تم إيقاف تشغيل الوسائط قبل الأذان (Tcalm)",
+        "notify_title_before_nm": "متبقي {minutes} دقائق على أذان {prayer}",
+        "notify_body_before_nm": "تم إيقاف تشغيل الوسائط قبل الأذان (Tcalm)",
+        "tui_opt_pause_before": "تحديد وقت الإيقاف المسبق للوسائط",
+        "tui_select_pause_before": "اختر وقت إيقاف الوسائط بالنسبة للأذان",
+        "tui_enter_pause_before": "أدخل عدد الدقائق للإيقاف قبل الأذان (0 عند الأذان):"
     },
     "en": {
         "status_running": "RUNNING",
@@ -195,7 +206,18 @@ MESSAGES = {
         "tui_enter_timezone": "Enter Timezone (e.g. Africa/Cairo):",
         "tui_enter_duration": "Enter duration in minutes (0 for single pause):",
         "tui_custom_entry": "Manual / Custom Entry...",
-        "tui_system_tz": "Use Current System Timezone ({tz})"
+        "tui_system_tz": "Use Current System Timezone ({tz})",
+        "pause_before": "Pause Timing",
+        "pause_before_exact": "Exact Adhan time",
+        "pause_before_1m": "1 minute before Adhan",
+        "pause_before_nm": "{minutes} minutes before Adhan",
+        "notify_title_before_1m": "1 minute until {prayer} prayer",
+        "notify_body_before_1m": "Media paused before Adhan (Tcalm)",
+        "notify_title_before_nm": "{minutes} minutes until {prayer} prayer",
+        "notify_body_before_nm": "Media paused before Adhan (Tcalm)",
+        "tui_opt_pause_before": "Change Pre-Adhan Pause Timing",
+        "tui_select_pause_before": "Select Pre-Adhan Pause Timing",
+        "tui_enter_pause_before": "Enter minutes before Adhan to pause media (0 for exact time):"
     }
 }
 
