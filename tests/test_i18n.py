@@ -35,3 +35,10 @@ def test_translation_formatting():
 
     # Fallback to key if not found
     assert t("non_existent_key_xyz", lang="en") == "non_existent_key_xyz"
+
+    # Pre-adhan translation tests
+    before_1m_ar = t("notify_title_before_1m", lang="ar", prayer="الظهر")
+    assert "الظهر" in before_1m_ar and "متبقي دقيقة" in before_1m_ar
+    before_1m_en = t("notify_title_before_1m", lang="en", prayer="Dhuhr")
+    assert "Dhuhr" in before_1m_en and "1 minute" in before_1m_en
+
