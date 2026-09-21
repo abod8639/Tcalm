@@ -69,10 +69,16 @@ def test_send_notification(monkeypatch):
     send_notification("Asr", lang="ar")
     assert any("notify-send" in cmd for cmd in recorded_commands)
 
+    # Test pre-adhan 1m notification
+    recorded_commands.clear()
+    send_notification("Asr", lang="ar", minutes_before=1)
+    assert any("متبقي دقيقة" in str(cmd) for cmd in recorded_commands)
+
     # Test macOS notification
+    recorded_commands.clear()
     monkeypatch.setattr("tcalm_core.media.get_system_os", lambda: "macos")
-    send_notification("Maghrib", lang="en")
-    assert any("osascript" in cmd for cmd in recorded_commands)
+    send_notification("Maghrib", lang="en", minutes_before=1)
+    assert any("1 minute until" in str(cmd) for cmd in recorded_commands)
 
 
 def test_execute_adhan_pause(monkeypatch):
@@ -80,9 +86,9 @@ def test_execute_adhan_pause(monkeypatch):
     notified = []
 
     monkeypatch.setattr("tcalm_core.media.pause_media", lambda: paused.append(True))
-    monkeypatch.setattr("tcalm_core.media.send_notification", lambda p, lang: notified.append(p))
+    monkeypatch.setattr("tcalm_core.media.send_notification", lambda p, lang, minutes_before=0: notified.append((p, minutes_before)))
 
-    execute_adhan_pause("Dhuhr", duration_minutes=0, notify=True, lang="en")
+    execute_adhan_pause("Dhuhr", duration_minutes=0, notify=True, lang="en", minutes_before=1)
     assert len(paused) == 1
     assert len(notified) == 1
-    assert notified[0] == "Dhuhr"
+    assert notified[0] == ("Dhuhr", 1)
