@@ -94,12 +94,19 @@ def pause_media():
     return False
 
 
-def send_notification(prayer_name, lang="en"):
+def send_notification(prayer_name, lang="en", minutes_before=0):
     """Sends a desktop notification on Linux or macOS in configured language."""
     from tcalm_core.i18n import t, get_prayer_name
     localized_name = get_prayer_name(prayer_name, lang=lang)
-    title = t("notify_title", lang=lang, prayer=localized_name)
-    body = t("notify_body", lang=lang)
+    if minutes_before == 1:
+        title = t("notify_title_before_1m", lang=lang, prayer=localized_name)
+        body = t("notify_body_before_1m", lang=lang)
+    elif minutes_before > 1:
+        title = t("notify_title_before_nm", lang=lang, prayer=localized_name, minutes=minutes_before)
+        body = t("notify_body_before_nm", lang=lang, minutes=minutes_before)
+    else:
+        title = t("notify_title", lang=lang, prayer=localized_name)
+        body = t("notify_body", lang=lang)
 
     os_name = get_system_os()
     if os_name == "linux":
@@ -119,15 +126,18 @@ def send_notification(prayer_name, lang="en"):
             pass
 
 
-def execute_adhan_pause(prayer_name, duration_minutes=0, notify=True, lang="en"):
+def execute_adhan_pause(prayer_name, duration_minutes=0, notify=True, lang="en", minutes_before=0):
     """Executes media pause and optional duration hold."""
     from tcalm_core.i18n import get_prayer_name
     localized_name = get_prayer_name(prayer_name, lang=lang)
-    log_message(f"Triggering Adhan pause for {prayer_name} ({localized_name}).")
+    if minutes_before > 0:
+        log_message(f"Triggering pre-Adhan pause ({minutes_before}m before) for {prayer_name} ({localized_name}).")
+    else:
+        log_message(f"Triggering Adhan pause for {prayer_name} ({localized_name}).")
 
     pause_media()
     if notify:
-        send_notification(prayer_name, lang=lang)
+        send_notification(prayer_name, lang=lang, minutes_before=minutes_before)
 
     if duration_minutes > 0:
         end_time = time.time() + (duration_minutes * 60)
