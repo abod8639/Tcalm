@@ -43,6 +43,7 @@ DEFAULT_CONFIG = {
     "timezone": "Africa/Cairo",
     "method": 5,
     "pause_duration_minutes": 0,
+    "pause_before_minutes": 1,
     "notifications": True,
     "prayers": ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]
 }
