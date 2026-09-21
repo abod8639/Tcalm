@@ -12,8 +12,9 @@
   
 </p>
 
-<!-- [![Downloads](https://img.shields.io/github/downloads/abod8639/Tcalm/total)](https://github.com/abod8639/Tcalm/releases) -->
-<!-- [![Latest Release Downloads](https://img.shields.io/github/downloads/abod8639/Tcalm/latest/total)](https://github.com/abod8639/Tcalm/releases) -->
+<!-- [![Downloads](https://img.shields.io/github/downloads/abod8639/Tcalm/total)](https://github.com/abod8639/Tcalm/releases)
+
+[![Latest Release Downloads](https://img.shields.io/github/downloads/abod8639/Tcalm/latest/total)](https://github.com/abod8639/Tcalm/releases) -->
 
 A lightweight, zero-dependency command-line utility for Linux and macOS that monitors Islamic prayer times (Adhan) in the background, automatically pausing media playback during prayer times and delivering desktop notifications.
 
@@ -148,6 +149,7 @@ Settings can be inspected and updated interactively via the built-in Terminal UI
 | `tcalm config --timezone "Africa/Cairo"` | Set timezone identifier |
 | `tcalm config --lat 30.0444 --lng 31.2357` | Set custom geographic coordinates |
 | `tcalm config --duration 10` | Hold playback pause for N minutes (default `0` for single pause) |
+| `tcalm config --before 1` | Pause media N minutes before Adhan (default `1`, set `0` for exact Adhan time) |
 | `tcalm config --method 5` | Calculation method (1-15, e.g. 1: Karachi, 2: ISNA, 3: MWL, 4: Makkah, 5: Egypt) |
 | `tcalm config --notifications false` | Toggle desktop notifications (`true` / `false`) |
 
