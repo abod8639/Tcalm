@@ -647,6 +647,37 @@ def choose_duration(cfg):
     return True
 
 
+def choose_pause_before(cfg):
+    """Sub-menu to choose pre-adhan pause timing in chosen language."""
+    lang = cfg.get("language", "en")
+    before_options = [
+        (t("pause_before_1m", lang=lang), 1),
+        (t("pause_before_exact", lang=lang), 0),
+        (t("pause_before_nm", lang=lang, minutes=2), 2),
+        (t("pause_before_nm", lang=lang, minutes=3), 3),
+        (t("pause_before_nm", lang=lang, minutes=5), 5),
+        (t("tui_custom_entry", lang=lang), -1),
+    ]
+
+    chosen = select_menu(t("tui_select_pause_before", lang=lang), before_options, lang=lang)
+    if chosen is None:
+        return False
+
+    if chosen == -1:
+        sys.stdout.write(CLEAR_SCREEN)
+        sys.stdout.write(f"{BOLD}{t('tui_enter_pause_before', lang=lang)}{RESET} ")
+        sys.stdout.flush()
+        val = input().strip()
+        try:
+            cfg["pause_before_minutes"] = max(0, int(val))
+            return True
+        except ValueError:
+            return False
+
+    cfg["pause_before_minutes"] = chosen
+    return True
+
+
 def choose_language(cfg):
     """Sub-menu to choose application language (Arabic or English)."""
     lang = cfg.get("language", "en")
@@ -675,6 +706,13 @@ def run_config_tui():
         method_name = get_method_name(cfg.get("method", 5), lang=lang)
         dur = cfg.get("pause_duration_minutes", 0)
         dur_str = t("single_pause", lang=lang) if dur == 0 else t("hold_minutes", lang=lang, minutes=dur)
+        pause_before = cfg.get("pause_before_minutes", 1)
+        if pause_before == 0:
+            before_str = t("pause_before_exact", lang=lang)
+        elif pause_before == 1:
+            before_str = t("pause_before_1m", lang=lang)
+        else:
+            before_str = t("pause_before_nm", lang=lang, minutes=pause_before)
         notify_str = t("tui_enabled", lang=lang) if cfg.get("notifications", True) else t("tui_disabled", lang=lang)
         current_lang_name = LANGUAGES.get(lang, "English")
 
@@ -684,6 +722,7 @@ def run_config_tui():
             f"  {t('timezone', lang=lang)}:  {cfg.get('timezone')}\n"
             f"  {t('method', lang=lang)}:    {method_name}\n"
             f"  {t('pause_action', lang=lang)}: {dur_str}\n"
+            f"  {t('pause_before', lang=lang)}: {before_str}\n"
             f"  {t('tui_opt_notify', lang=lang, status=notify_str)}{RESET}"
         )
 
@@ -694,6 +733,7 @@ def run_config_tui():
             (t("tui_opt_timezone", lang=lang), "TIMEZONE"),
             (t("tui_opt_method", lang=lang), "METHOD"),
             (t("tui_opt_duration", lang=lang), "DURATION"),
+            (t("tui_opt_pause_before", lang=lang), "PAUSE_BEFORE"),
             (t("tui_opt_notify", lang=lang, status=notify_str), "NOTIFICATIONS"),
             (t("tui_opt_save", lang=lang), "SAVE"),
             (t("tui_opt_cancel", lang=lang), "EXIT")
@@ -724,6 +764,9 @@ def run_config_tui():
 
         elif action == "DURATION":
             choose_duration(cfg)
+
+        elif action == "PAUSE_BEFORE":
+            choose_pause_before(cfg)
 
         elif action == "NOTIFICATIONS":
             cfg["notifications"] = not cfg.get("notifications", True)
