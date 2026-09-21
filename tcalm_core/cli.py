@@ -169,6 +169,14 @@ def cmd_status():
     dur = cfg.get("pause_duration_minutes", 0)
     dur_text = t("single_pause", lang=lang) if dur == 0 else t("hold_minutes", lang=lang, minutes=dur)
     print(f"  ● {t('pause_action', lang=lang):<14}: {dur_text}")
+    pause_before = cfg.get("pause_before_minutes", 1)
+    if pause_before == 0:
+        before_text = t("pause_before_exact", lang=lang)
+    elif pause_before == 1:
+        before_text = t("pause_before_1m", lang=lang)
+    else:
+        before_text = t("pause_before_nm", lang=lang, minutes=pause_before)
+    print(f"  ● {t('pause_before', lang=lang):<14}: {before_text}")
     print("--------------------------------------------------")
 
     print_status_summary(cfg)
@@ -231,6 +239,7 @@ def cmd_config(args):
         args.lng is not None,
         args.method is not None,
         args.duration is not None,
+        getattr(args, "pause_before", None) is not None,
         args.notifications is not None,
         getattr(args, "language", None) is not None,
         getattr(args, "json", False),
@@ -284,6 +293,9 @@ def cmd_config(args):
     if args.duration is not None:
         cfg["pause_duration_minutes"] = max(0, args.duration)
         modified = True
+    if getattr(args, "pause_before", None) is not None:
+        cfg["pause_before_minutes"] = max(0, args.pause_before)
+        modified = True
     if args.notifications is not None:
         cfg["notifications"] = (args.notifications.lower() in ["true", "1", "yes"])
         modified = True
@@ -315,6 +327,7 @@ Examples:
   tcalm test                    Test media pause & notification
   tcalm config --city "Cairo"   Set city manually
   tcalm config --duration 10    Keep media paused for 10 minutes
+  tcalm config --before 1       Pause media 1 minute before Adhan
   tcalm config --auto-detect    Re-detect location via IP
         """
     )
@@ -337,6 +350,7 @@ Examples:
     cfg_parser.add_argument("--lng", type=float, help="Set longitude")
     cfg_parser.add_argument("--method", type=int, help="Calculation method (1-15)")
     cfg_parser.add_argument("--duration", type=int, help="Pause duration in minutes (0 for single pause)")
+    cfg_parser.add_argument("--before", "--pause-before", type=int, dest="pause_before", help="Pause media N minutes before Adhan (default 1, set 0 for exact Adhan time)")
     cfg_parser.add_argument("--notifications", type=str, help="Enable or disable desktop notifications (true/false)")
     cfg_parser.add_argument("--auto-detect", action="store_true", help="Auto-detect location and timezone")
     cfg_parser.add_argument("--language", choices=["ar", "en"], help="Set interface language (ar/en)")
