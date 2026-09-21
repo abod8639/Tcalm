@@ -38,9 +38,11 @@ def test_default_config_structure():
         "timezone",
         "method",
         "pause_duration_minutes",
+        "pause_before_minutes",
         "notifications",
         "prayers",
     ]
     for key in required_keys:
         assert key in DEFAULT_CONFIG
+    assert DEFAULT_CONFIG["pause_before_minutes"] == 1
     assert len(DEFAULT_CONFIG["prayers"]) == 5
