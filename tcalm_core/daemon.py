@@ -62,6 +62,7 @@ def daemon_loop():
 
             allowed_prayers = cfg.get("prayers", ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"])
             duration = cfg.get("pause_duration_minutes", 0)
+            pause_before = cfg.get("pause_before_minutes", 1)
             notify = cfg.get("notifications", True)
 
             upcoming_prayers = []
@@ -71,16 +72,17 @@ def daemon_loop():
                     continue
                 hh, mm = map(int, t_str.split(":"))
                 p_dt = datetime(now.year, now.month, now.day, hh, mm, 0)
+                trigger_dt = p_dt - timedelta(minutes=pause_before)
 
                 key = f"{today_date}_{p_name}"
-                diff_secs = (now - p_dt).total_seconds()
+                diff_secs = (now - trigger_dt).total_seconds()
 
                 if 0 <= diff_secs < 60 and key not in last_handled:
                     last_handled[key] = True
                     lang = cfg.get("language", "en")
-                    execute_adhan_pause(p_name, duration, notify, lang=lang)
-                elif p_dt > now:
-                    upcoming_prayers.append((p_dt, p_name))
+                    execute_adhan_pause(p_name, duration, notify, lang=lang, minutes_before=pause_before)
+                elif trigger_dt > now:
+                    upcoming_prayers.append((trigger_dt, p_name))
 
             if upcoming_prayers:
                 next_dt, next_name = min(upcoming_prayers, key=lambda x: x[0])
