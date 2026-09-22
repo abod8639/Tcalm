@@ -158,6 +158,8 @@ def cmd_status():
         status_txt = t("status_stopped", lang=lang)
         print(f"  ○ {status_label:<14}: {status_txt}")
 
+    print(f"  ● {t('version', lang=lang):<14}: v{VERSION}")
+
     utc_offset = datetime.now().astimezone().strftime("%z")
     formatted_offset = f"UTC{utc_offset[:3]}:{utc_offset[3:]}"
     dst_status = t("dst_active", lang=lang) if time.localtime().tm_isdst > 0 else t("dst_inactive", lang=lang)
@@ -325,12 +327,15 @@ Examples:
   tcalm status                  Check service status and next prayer
   tcalm list                    List today's prayer times
   tcalm test                    Test media pause & notification
+  tcalm -v, --version           Show current version
   tcalm config --city "Cairo"   Set city manually
   tcalm config --duration 10    Keep media paused for 10 minutes
   tcalm config --before 1       Pause media 1 minute before Adhan
   tcalm config --auto-detect    Re-detect location via IP
         """
     )
+
+    parser.add_argument("-v", "--version", action="version", version=f"Tcalm version {VERSION}")
 
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
@@ -356,7 +361,7 @@ Examples:
     cfg_parser.add_argument("--language", choices=["ar", "en"], help="Set interface language (ar/en)")
     cfg_parser.add_argument("--json", action="store_true", help="Print configuration in JSON format without interactive TUI")
 
-    subparsers.add_parser("version", help="Show version")
+    subparsers.add_parser("version", help="Show current version")
 
     args = parser.parse_args()
 
@@ -380,3 +385,7 @@ Examples:
         print(f"Tcalm version {VERSION}")
     else:
         cmd_status()
+
+
+if __name__ == "__main__":
+    main()
