@@ -12,6 +12,22 @@ def test_cli_version(monkeypatch, capsys):
     captured = capsys.readouterr()
     assert f"Tcalm version {VERSION}" in captured.out
 
+    # Test --version flag
+    monkeypatch.setattr(sys, "argv", ["tcalm", "--version"])
+    with pytest.raises(SystemExit) as excinfo:
+        main()
+    assert excinfo.value.code == 0
+    captured_flag = capsys.readouterr()
+    assert f"Tcalm version {VERSION}" in captured_flag.out
+
+    # Test -v flag
+    monkeypatch.setattr(sys, "argv", ["tcalm", "-v"])
+    with pytest.raises(SystemExit) as excinfo:
+        main()
+    assert excinfo.value.code == 0
+    captured_short = capsys.readouterr()
+    assert f"Tcalm version {VERSION}" in captured_short.out
+
 
 def test_cli_status(monkeypatch, capsys, isolated_tcalm_env):
     mock_timings = {
@@ -29,6 +45,7 @@ def test_cli_status(monkeypatch, capsys, isolated_tcalm_env):
     captured = capsys.readouterr()
     assert "Status" in captured.out or "الحالة" in captured.out
     assert "Cairo" in captured.out or "Egypt" in captured.out
+    assert VERSION in captured.out
 
 
 def test_cli_list(monkeypatch, capsys, isolated_tcalm_env):
