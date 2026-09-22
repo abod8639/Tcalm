@@ -5,7 +5,7 @@ import tty
 import termios
 import select
 
-from tcalm_core.constants import CACHE_FILE
+from tcalm_core.constants import CACHE_FILE, VERSION
 from tcalm_core.config import load_config, save_config
 from tcalm_core.geo import detect_location
 from tcalm_core.daemon import get_daemon_pid
@@ -717,7 +717,7 @@ def run_config_tui():
         current_lang_name = LANGUAGES.get(lang, "English")
 
         menu_title = (
-            f"{t('tui_dashboard', lang=lang)}\n"
+            f"{t('tui_dashboard', lang=lang)} (v{VERSION})\n"
             f"  {DIM}{t('location', lang=lang)}:  {cfg.get('city')}, {cfg.get('country')}\n"
             f"  {t('timezone', lang=lang)}:  {cfg.get('timezone')}\n"
             f"  {t('method', lang=lang)}:    {method_name}\n"
