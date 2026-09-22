@@ -99,6 +99,7 @@ Example output:
                  Tcalm Status                     
 ==================================================
   ● Status:           RUNNING (PID: 172135)
+  ● Version:          v1.1.0
   ● Location:         Giza, Egypt
   ● Timezone:         Africa/Cairo (UTC+03:00, DST: Active)
   ● Coordinates:      Lat: 30.0046, Lng: 31.2044
@@ -107,6 +108,15 @@ Example output:
 --------------------------------------------------
     Next Prayer: Dhuhr (الظهر) at 12:49 (in 7h 5m)
 ==================================================
+```
+
+### Show Version
+```bash
+tcalm --version
+# or
+tcalm -v
+# or
+tcalm version
 ```
 
 ### Daily Timetable
