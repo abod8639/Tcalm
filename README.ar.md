@@ -95,6 +95,7 @@ tcalm status
                  Tcalm Status                     
 ==================================================
   ● Status:           RUNNING (PID: 172135)
+  ● Version:          v1.1.0
   ● Location:         Giza, Egypt
   ● Timezone:         Africa/Cairo (UTC+03:00, DST: Active)
   ● Coordinates:      Lat: 30.0046, Lng: 31.2044
@@ -103,6 +104,15 @@ tcalm status
 --------------------------------------------------
     Next Prayer: Dhuhr (الظهر) at 12:49 (in 7h 5m)
 ==================================================
+```
+
+### عرض الإصدار الحالي
+```bash
+tcalm --version
+# أو
+tcalm -v
+# أو
+tcalm version
 ```
 
 ### عرض جدول مواقيت الصلاة لليوم
