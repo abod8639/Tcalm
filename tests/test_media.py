@@ -43,6 +43,54 @@ def test_pause_media_linux_dbus_fallback(monkeypatch):
     assert pause_media() is True
 
 
+def test_pause_media_linux_multiple_players(monkeypatch):
+    monkeypatch.setattr("tcalm_core.media.get_system_os", lambda: "linux")
+
+    called_commands = []
+
+    def mock_subprocess_run(cmd, **kwargs):
+        called_commands.append(cmd)
+        if cmd == ["playerctl", "-l"]:
+            return subprocess.CompletedProcess(cmd, returncode=0, stdout="spotify\nfirefox.instance_1_47\n")
+        if cmd[0] == "playerctl" and "status" in cmd:
+            return subprocess.CompletedProcess(cmd, returncode=0, stdout="paused\n")
+        if cmd[0] == "playerctl":
+            return subprocess.CompletedProcess(cmd, returncode=0, stdout="")
+        return subprocess.CompletedProcess(cmd, returncode=0)
+
+    monkeypatch.setattr(subprocess, "run", mock_subprocess_run)
+    assert pause_media() is True
+
+    # Assert that both individual players were targeted
+    assert ["playerctl", "-p", "spotify", "pause"] in called_commands
+    assert ["playerctl", "-p", "firefox.instance_1_47", "pause"] in called_commands
+
+
+def test_pause_media_linux_multi_tab_browser(monkeypatch):
+    monkeypatch.setattr("tcalm_core.media.get_system_os", lambda: "linux")
+
+    pause_calls = 0
+
+    def mock_subprocess_run(cmd, **kwargs):
+        nonlocal pause_calls
+        if cmd == ["playerctl", "-l"]:
+            return subprocess.CompletedProcess(cmd, returncode=0, stdout="firefox.instance_1_47\n")
+        if cmd == ["playerctl", "-p", "firefox.instance_1_47", "pause"]:
+            pause_calls += 1
+            return subprocess.CompletedProcess(cmd, returncode=0)
+        if cmd == ["playerctl", "-p", "firefox.instance_1_47", "status"]:
+            # Returns playing for the first 2 calls (representing 2 tabs), then paused
+            if pause_calls < 2:
+                return subprocess.CompletedProcess(cmd, returncode=0, stdout="Playing\n")
+            return subprocess.CompletedProcess(cmd, returncode=0, stdout="Paused\n")
+        return subprocess.CompletedProcess(cmd, returncode=0)
+
+    monkeypatch.setattr(subprocess, "run", mock_subprocess_run)
+    assert pause_media() is True
+    # Verified it paused more than once to catch the second tab
+    assert pause_calls == 2
+
+
 def test_pause_media_macos(monkeypatch):
     monkeypatch.setattr("tcalm_core.media.get_system_os", lambda: "macos")
 
