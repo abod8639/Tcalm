@@ -29,6 +29,7 @@ from tcalm_core.i18n import (
     get_method_name,
     CALCULATION_METHODS,
 )
+from tcalm_core.updater import cmd_version
 
 
 def cmd_start():
@@ -361,7 +362,11 @@ Examples:
     cfg_parser.add_argument("--language", choices=["ar", "en"], help="Set interface language (ar/en)")
     cfg_parser.add_argument("--json", action="store_true", help="Print configuration in JSON format without interactive TUI")
 
-    subparsers.add_parser("version", help="Show current version")
+    ver_parser = subparsers.add_parser("version", help="Show current version and check for updates")
+    ver_parser.add_argument("--no-check", action="store_true", help="Do not check GitHub for updates")
+
+    subparsers.add_parser("check-update", help="Check for newer Tcalm releases")
+    subparsers.add_parser("update", help="Check for and install updates")
 
     args = parser.parse_args()
 
@@ -381,8 +386,10 @@ Examples:
         daemon_loop()
     elif args.command == "config":
         cmd_config(args)
-    elif args.command == "version":
-        print(f"Tcalm version {VERSION}")
+    elif args.command in ("version", "update", "check-update"):
+        cfg = load_config()
+        check_up = not getattr(args, "no_check", False)
+        cmd_version(cfg, check_update=check_up)
     else:
         cmd_status()
 
