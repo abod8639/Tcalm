@@ -1,6 +1,8 @@
 import os
 
 VERSION = "1.1.0"
+GITHUB_REPO = "abod8639/Tcalm"
+GITHUB_API_LATEST_RELEASE = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 
 CONFIG_DIR = os.path.expanduser("~/.config/tcalm")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
