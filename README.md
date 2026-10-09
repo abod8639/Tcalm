@@ -115,13 +115,15 @@ Example output:
 ==================================================
 ```
 
-### Show Version
+### Show Version & Check Updates
 ```bash
 tcalm --version
 # or
 tcalm -v
-# or
+# or show version and check for updates via GitHub
 tcalm version
+# or
+tcalm check-update
 ```
 
 ### Daily Timetable
