@@ -17,15 +17,40 @@ def pause_media():
     os_name = get_system_os()
 
     if os_name == "linux":
-        # 1. Try playerctl
+        paused_any = False
+
+        # 1. Target every player individually via playerctl (handles multiple players & multi-tab sessions)
         try:
-            res = subprocess.run(["playerctl", "-a", "pause"], capture_output=True, timeout=2)
+            res = subprocess.run(["playerctl", "-l"], capture_output=True, text=True, timeout=2)
             if res.returncode == 0:
-                return True
+                stdout = res.stdout or ""
+                players = [p.strip() for p in stdout.splitlines() if p.strip()]
+                for player in players:
+                    # Browsers (e.g. Firefox) may transition to the next playing tab once the active one is paused.
+                    # Loop up to 5 times per player while status is 'playing' to ensure stacked tabs are paused.
+                    for _ in range(5):
+                        p_res = subprocess.run(["playerctl", "-p", player, "pause"], capture_output=True, timeout=2)
+                        if p_res.returncode == 0:
+                            paused_any = True
+
+                        st = subprocess.run(["playerctl", "-p", player, "status"], capture_output=True, text=True, timeout=1)
+                        st_out = (st.stdout or "").strip().lower()
+                        if st.returncode == 0 and st_out == "playing":
+                            time.sleep(0.05)
+                            continue
+                        break
         except (FileNotFoundError, subprocess.SubprocessError):
             pass
 
-        # 2. Try DBus MPRIS pause fallback
+        # 2. Broadcast playerctl pause to all players
+        try:
+            res = subprocess.run(["playerctl", "-a", "pause"], capture_output=True, timeout=2)
+            if res.returncode == 0:
+                paused_any = True
+        except (FileNotFoundError, subprocess.SubprocessError):
+            pass
+
+        # 3. Direct DBus MPRIS pause on all registered media services
         try:
             dbus_cmd = (
                 "for dest in $(dbus-send --session --dest=org.freedesktop.DBus --type=method_call "
@@ -33,10 +58,13 @@ def pause_media():
                 "dbus-send --session --dest=\"$dest\" --type=method_call /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Pause; "
                 "done"
             )
-            subprocess.run(["bash", "-c", dbus_cmd], capture_output=True, timeout=3)
-            return True
+            res_dbus = subprocess.run(["bash", "-c", dbus_cmd], capture_output=True, timeout=3)
+            if res_dbus.returncode == 0:
+                paused_any = True
         except Exception:
             pass
+
+        return paused_any
 
     elif os_name == "macos":
         applescript = """
